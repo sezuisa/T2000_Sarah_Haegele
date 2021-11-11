@@ -1,0 +1,142 @@
+===============================
+         T2000 - NOTES
+===============================
+
+== GRUNDLAGEN ==
+
+	- Aufbau CIF
+		-
+
+== IST-ANALYSE ==
+
+	- Aufbau Testprojekt
+		- Code-Struktur
+		- Testarten (White Box, Black Box, Smoke, Regression etc.)
+		- Momentanes Testdatenhandling (manuell gepflegte JSON-Files)
+
+
+	- In der Literatur ist bei Testdatengenerierung oft von der Generierung ganzer Testfälle die Rede. In diesem Projekt sind diese allerdings bereits definiert; es dreht sich also tatsächlich nur um das Generieren von Datensätzen passend für die vorhandenen Testfälle.
+
+== SOLL-ZUSTAND ==
+
+	- Anforderungsanalyse. Was soll die automatische Testdatengenerierung erfüllen?
+		- Testdatengenerierung vor den Tests (Testgruppen)
+		- Testdaten für sämtliche testdatenbezogene Tests des CIF sollen automatisch generiert werden (so weit wie möglich)
+		- Testdaten sollen automatisch nach der Testausführung wieder gelöscht werden
+		- Das Projekt muss gut dokumentiert sein, um es einfach nachvollziehen, erweitern oder warten zu können
+		- Direkte Einbindung in das bestehende Testprojekt - "läuft das Testprojekt, läuft auch die Datengenerierung"
+		- Keine erheblichen Performance-Einbußen (mit leichten Einbußen durch die benötigte Zeit zur Datengenerierung ist zu rechnen) -> Benchmarks?
+		- Es sollten nur so viele Testdaten und nur so detailreich wie nötig generiert werden, um Performance und Komplexität zu optimieren
+		- Es sollten nach der Implementation nahezu keine händischen Schritte in Bezug zu Testdaten mehr nötig sein
+
+		- (Bei neuen Entitäten keine manuelle Erweiterung des Projekts nötig; wird automatisch erkannt) -> zu komplex
+
+
+	- Analyse der benötigten Testdaten
+		- Herleitung über formulierte Testfälle
+		- Testdaten v.A. für E2E-Tests
+		- Devices
+			- Network Element
+			- Chassis
+			- Module
+			- SFP
+		- Service
+			- Bearer
+			- Cell
+			- Logical Port 
+			- Multipoint
+			- Network Function
+			- Path
+			- Path Routing
+			- Sap
+			- Unrouted Multipoint
+		- Zone
+			- Campus
+			- Building
+			- Floor
+			- Room
+		- Common Data
+		- Dynamic Data
+		- Data Cable
+		- Job
+
+	- Toolanalyse
+		- APIs zur Datengenerierung: java-faker, jfairy, fabricator (vermutlich eher nicht geeignet, da die hierdurch generierten Daten nicht wirklich passend für die Entitäten sind)
+
+== KONZEPTIONIERUNG ==
+	- evtl. Generierung der Testdaten parallel zu vorhergehenden Tests, um Performance zu verbessern?
+
+	- Ideen:
+		- Definition des Schemas der benötigten Testdaten in einer Datei, dann parsen + dementsprechend Daten generieren (vgl. benerator: https://github.com/rapiddweller/rapiddweller-benerator-ce/blob/development/src/demo/resources/demo/anon/anon.ben.xml)
+		- Hierbei z.B. angeben:
+			- welche Entitäten
+			- welche Cases benötigt werden (create, update etc.) -> bestimmt auch, wie viele Objekte generiert werden müssen
+			- 
+
+
+		- Machine Learning: Algorithmus anlernen mit validen Daten, sodass er von selbst die benötigten Werte füllt -> zu aufwändig (Lernphase sehr daten- und arbeitsintensiv; im Vergleich zur Menge der benötigten Testdaten wohl nicht lohnenswert)
+
+		- 1 Dummy-Objekt pro Entität immer in Command vorhanden, nach diesem Objekt richtet sich die Generierung von Daten für weitere Objekte dieser Entität
+
+		- Data-Generation-Methode mit Restrictions, z.B. um zwei fast gleiche Objekte zu generieren, die sich nur in Typ und ID unterscheiden (für Planning Cases)
+			- z.B. generateSimilar(restrictions)
+
+		- Per Bge verfügbare Entities, Device Master etc. erfragen
+
+		- 
+
+
+		- Chassis: 
+			- Welche Attribute werden benötigt?
+			- Zone: Campus, Gebäude etc. generieren 
+			- Validen Chassityp abfragen 
+			- evtl. Source System erstellen
+
+		- Module:
+			- Über Bge-Endpunkt /app/command/axis/api/rest/entity/deviceMasterDevice/isModuleValidForSlot einen Module Device Master finden, welcher in das Chassis passt
+
+	- TESTAUFBAU
+
+		Möglichkeiten zum Aufbau: 
+			- Komplett hierarchisch, einer Reihenfolge folgend -> entspricht eigentlich nicht der Grundidee von Unit Tests
+			- Alle Tests komplett autark/abgekapselt -> entspricht zwar der Idee eines Unit Tests, allerdings sehr Ressourcenintensiv, bläht die Tests auf, v.A. je weiter fortgeschritten der Testverlauf ist (Jeder Servicetest braucht z.B. alles zuvor getestete als Precondition)
+			-> Kompromiss: Aufteilung der Tests in logische Gruppen (Zone, Hardware, Service); Datengenerierung neu für jede Gruppe, aber innerhalb der Gruppe werden die gleichen Daten verwendet und nicht für jeden Test neu generiert -> Pre-processing at Test Suite
+
+		Zonen:
+			1) Source System generieren & prüfen
+			2) Zonentests durchführen
+
+		Hardware: Alle Precondition-Daten und Hardwaredaten generieren
+			1) Zonendaten generieren (über Command-BGEs, nicht über CIF/nms)
+			2) Source System generieren
+			3) Chassisdaten
+			4) Module-Daten (Achtung: Chassis-Slot muss kompatibel mit Module sein)
+			5) Hardwaretests durchführen
+
+		Service: Alle Precondition-Daten und Servicedaten generieren
+
+== REALISIERUNG ==
+	- 
+
+== EVALUIERUNG ==
+	-
+
+
+	{
+    "cSourceId": "TEST_MODULE_1",
+    "cSourceSystem": "CIF_AUTOMATED_TEST",
+    "cSourceType": "DELL_PCI-1RJ45",
+    "id": "TEST_MODULE_1_ID",
+    "ipAddress": "10.122.77.02",
+    "remark": "Test Module to place in chassis",
+    "serialNo": "135703742",
+    "sourceSystem": "CIF_AUTOMATED_TEST",
+    "visibleId": "TEST_MODULE_1_VISIBLE_ID",
+    "createLinkDeviceMaster": {
+        "linkedElid": "5PIQYKM4Z5COB4"
+    },
+    "createLinkToSlot": {
+        "deviceAllElid": "MU4QG8V97KJ5MH",
+        "slotNo": 1
+    }
+}

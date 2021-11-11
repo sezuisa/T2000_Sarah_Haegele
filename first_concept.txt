@@ -1,0 +1,58 @@
+== Schritt-für-Schritt-Beschreibung eines möglichen Ablaufs (Beispielhaft für Hardware) ==
+
+1) Erstellen von XML-Dateien, welche die Anforderungen an die gewünschten Testdaten beschreiben
+    - Separate Datei für Device, Service, Zone&Common&Dynamic&DataCable, NMS Operations -> für jede Test Suite eine Konfigurationsdatei
+    - Entitäten (Chassis, NE, Switch Cabinet, Module, SFP, ...)
+    - Pro Entität Deltafälle (CREATE, PLANNED_DELETE, ...)
+
+2) Parsen der XML-Datei
+    - Speichern in LinkedHashMap: Key - Value -> Entity - List<DeltaCase>
+    - Erste Inputvalidierung: Überprüfung, ob die angegebenen Entitäten und Deltafälle überhaupt existieren, bzw. korrekt sind -> Exceptions
+    - Je nach Art der Entitäten (Hardware, Service, ...) wird eine entsprechende Methode zur Datengenerierung aufgerufen
+
+Hadrware-Datengenerierung:
+3) Iteration über die Map
+    - Listen mit CommandObject-Objekten, die nach den Iterationen in Command zur Objekterstellung genutzt werden:
+        - commandData
+        - nmsData
+        - planningCreateData
+        - planningDeleteData
+    - Äußere Schleife über die Entitäten, dabei wird eine String-Variable gesetzt, welche die Entität bezeichnet (String wird passend formatiert)
+    - Abfragen der verfügbaren Attribute für die Entität & Speicherung des Objekts (CommandObject-Objekt) -> s. https://stackoverflow.com/questions/7495785/java-how-to-instantiate-a-class-from-string (Klasse wird anhand der String-Variable gewählt)
+    
+    - Für ein NMS-Objekt:
+        - über cifEntityConfiguration zuerst nach commandEntityId abfragen (z.B. CHASSIS) -> REST /app/command/axis/api/rest/entity/cifEntityConfiguration/query
+        - Elid für die Entität speichern und damit die Attributkonfigurationen abfragen -> REST /app/command/axis/api/rest/entity/cifEntityConfiguration/{ENTITY_ELID}/QueryCifAttributeConfiguration
+
+    - Innere Schleife über die Deltafälle
+    - Restrictions für die Fälle zunächst auch statisch speichern (z.B. in Map: Key - Value -> CREATE - {1, "nms"} oder PLANNED_CREATE - {2, "nms,planningCreate"} oder PLANNED_DELETE_WITH_PLANNED_CREATE - {4, "nms,planningCreate,command,planningDelete"})
+    - Wenn Anzahl der zu erstellenden Objekte > 1, dann wird die visibleId für alle Objekte zwischengespeichert und wiederverwendet
+
+    Werte generieren
+        - Utils-Klasse mit allen möglichen Methoden zur Datengenerierung
+        Benötigte Werte:
+            - Id für Command-Objekte mit Zufallswerten generieren
+            - nmsId & visibleId mit Parameter generieren (Entity name & delta case in all-caps) -> TEST_ENTITY_DELTACASE
+            - Remark ähnlich wie visibleId -> Test nms [Entity] [DeltaCase]
+            - IP 
+            - nmsType & commandType
+            - nmsSourceSystem & cSourceSystem & sourceSystem 
+            - serialNo
+            - 
+
+    Werte für Update abändern:
+        - über cifEntityConfiguration zuerst nach commandEntityId abfragen (z.B. CHASSIS) -> REST /app/command/axis/api/rest/entity/cifEntityConfiguration/query
+        - Elid für die Entität speichern und damit die Attributkonfigurationen abfragen -> REST  /app/command/axis/api/rest/entity/cifEntityConfiguration/{ENTITY_ELID}/QueryCifAttributeConfiguration
+        - Werte mit "deltaCalculation": "Y" können für den Deltafall UPDATE verwendet werden
+
+
+        - Aufrufen der korrekten Methode evtl. über Name des Attributs, ähnliche Attribute gruppieren und für diese Gruppe von Strings eine zugehörige Methode definieren?
+
+4) Preconditions & Erstellung der Objekte in Command
+    - Je nach Entität validieren, ob Preconditions erfüllt sind, sonst müssen diese erstellt werden
+    - Chassis, NE & Switch Cabinet:
+        - Source System, Zone (Campus, Building, Floor, Room) -> per BGEs erstellen
+    - Module & SFP:
+        - zusätzlich ein Chassis, welches mit dem Module bzw. SFP kompatibel ist (neues Testchassis nur für Module & SFP Tests)
+    - Wenn für das Objekt die Preconditions erfüllt sind, kann es über die BGEs erstellt werden
+

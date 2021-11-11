@@ -1,0 +1,175 @@
+================================
+       LITERATUR - NOTES
+================================
+
+Reviewing Automatic Test Data Generation
+- https://www.researchgate.net/profile/Dr-Mukesh-Kumar-2/publication/334263137_Reviewing_Automatic_Test_Data_Generation/links/5d1f95e692851cf44068e314/Reviewing-Automatic-Test-Data-Generation.pdf
+
+Automated Test Data Generation
+- https://www.ripublication.com/irph/ijse17/ijsev7n1_02.pdf
+
+The chaining approach for software test data generation
+- https://dl.acm.org/doi/abs/10.1145/226155.226158
+
+End to End testing - What should you know?
+- https://ieeexplore.ieee.org/document/6798999
+
+End-to-end integration testing design
+- https://ieeexplore.ieee.org/abstract/document/960613
+
+JUnit 5 User Guide
+- https://junit.org/junit5/docs/current/user-guide/
+
+Software Test Automation
+- https://d1wqtxts1xzle7.cloudfront.net/54117747/Software_Test_Automation-with-cover-page-v2.pdf?Expires=1636021932&Signature=Tj5OLmYZCK6jsiKsvkpIX2tCPmiFchHFsr9XbM-14Sjo1NYlfd6UkTsHyRLXbicky8PKYqKsUihM7-WBBr-O3jg8WfM~eCK8p5nBM~ie0YAGYld2INMAmMRLM8GFfk6qyfy-bYVhJNDyYrxzRwYPHhQInlrVNvUxIOlrgsg0IROfeS3wL8Rvua~7lpXHlGN5iMFIdmOf3IOsRN8u3nTFTjV2~gPTztRt6A0yRASJDgytAmjDB90Nr00iU-uABkFRkdJBdGOsQ0nK~ToWTpfV0mbTgQ4vAxmZIqtMKhEqeKu4vrt0F-8rplPDXSK-nSPb8GTNZk4HzYz~KLMT2KS3iA__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA
+-> Kapitel 6.2 (Pre-processing)
+-> Kapitel 10 (Tool selection)
+
+Designing a Customized Test Data Generator for Effective Testing of a Large Database
+- https://ieeexplore.ieee.org/abstract/document/4736927
+
+Introduction to Software Testing
+- https://books.google.de/books?hl=en&lr=&id=58LeDQAAQBAJ&oi=fnd&pg=PR10&dq=test+data+for+junit+tests&ots=VAf1LNTLZT&sig=5NEgHBze-XC4RJz1AEo4Nd3HDMg&redir_esc=y#v=onepage&q=test%20data%20for%20junit%20tests&f=false
+
+Synthetic data generation for statistical testing
+- https://ieeexplore.ieee.org/abstract/document/8115698
+
+Data generators: a short survey of techniques and use cases with focus on testing
+- https://ieeexplore.ieee.org/abstract/document/8966202
+
+An Overview on Automated Test Data Generation
+- https://www2.swc.rwth-aachen.de/docs/teaching/seminar2016/FsSE%20CTRelEng%202016.pdf#page=35
+
+WSDL-Based Automated Test Data Generation for Web Service
+- https://ieeexplore.ieee.org/abstract/document/4722155
+
+Practical Synthetic Data Generation: Balancing Privacy and the Broad Availability of Data
+- https://books.google.de/books?hl=en&lr=&id=XWnnDwAAQBAJ&oi=fnd&pg=PP1&dq=%22data+generation%22+principles+and+methods&ots=FnwO7gUhqo&sig=lI5OsXlYVd_mrSnvl1WgLAEynmk#v=onepage&q=%22data%20generation%22%20principles%20and%20methods&f=false
+
+Issues in Generating Data Bindings for an XML Schema-Based Language
+- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.116.4804&rep=rep1&type=pdf
+
+Synthetic Data Generation using Benerator Tool
+- https://arxiv.org/pdf/1311.3312.pdf
+
+A Parallel General-Purpose Synthetic Data Generator
+- https://dl.acm.org/doi/abs/10.1145/1276301.1276305
+
+Synthetic data generation: Theory, techniques and applications
+- https://www.proquest.com/openview/a5bebe4b3360fdcd422cdb884619eca9/1?cbl=18750&pq-origsite=gscholar
+
+Pragmatic Unit Testing using JUnit
+- https://vickychhetri.com/wp-content/uploads/2021/09/28Pragmatic20starter20kit20series2022920Andy20Hunt2C20Dave20Thomas20-20Pragmatic20unit20testing20in20Java20with20JUnit-Pragmatic20Bookshelf2028200329.pdf
+
+XML-BASED AUTOMATIC TEST DATA GENERATION
+- file:///C:/Users/sarah.haegele/Downloads/240-828-1-PB.pdf
+
+A Parallel General-Purpose Synthetic Data Generator1
+- https://link.springer.com/chapter/10.1007/978-1-4419-0176-7_6
+
+Reducing test effort: A systematic mapping study on existing approaches
+- https://www.sciencedirect.com/science/article/abs/pii/S0950584912000894
+
+A Systematic Review of Automated Test Data Generation Techniques
+- https://www.diva-portal.org/smash/record.jsf?pid=diva2%3A831684&dswid=4685
+
+Software testing: a research travelogue (2000–2014)
+- https://dl.acm.org/doi/abs/10.1145/2593882.2593885
+
+Empirical Observations on Software Testing Automation
+- https://ieeexplore.ieee.org/abstract/document/4815352
+
+
+
+- https://books.google.de/books?hl=en&lr=&id=cSpzCQAAQBAJ&oi=fnd&pg=PR3&dq=test+data+generation+for+functional+testing&ots=GMZCN4WDio&sig=-TaqpN9lKV3z_dNAQS9muvZQ1yI&redir_esc=y#v=onepage&q=test%20data%20generation%20for%20functional%20testing&f=false
+
+A DSL for Web Services Automatic Test Data Generation
+- https://www.researchgate.net/profile/Henrique-Ferreiro/publication/259725434_A_DSL_for_Web_Services_Automatic_Test_Data_Generation/links/576015ad08ae227f4a3ee33f/A-DSL-for-Web-Services-Automatic-Test-Data-Generation.pdf
+
+- https://dl.acm.org/doi/abs/10.1145/2543728.2543741
+
+
+Random Test Data Generation for Java Classes Annotated with JML Specifications
+- https://scholarworks.utep.edu/cs_techrep/105/
+
+Integrating Random Testing with Constraints for Improved Efficiency and Diversity
+- https://scholarworks.utep.edu/cs_techrep/73/
+
+Synthesize It: From Design by Contract to Meaningful Test Input Data
+- https://ieeexplore.ieee.org/abstract/document/5637153
+
+Automated Boundary Test Generation from JML Specifications
+- https://link.springer.com/chapter/10.1007/11813040_29
+
+Test Data Generation using Static Call Sequence Analysis and Design by Contract™ Specifications
+- http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.475.1440&rep=rep1&type=pdf
+
+A Comparison of Constraint-Based and Sequence-Based Generation of Complex Input Data Structures
+- https://ieeexplore.ieee.org/abstract/document/5463666
+
+A Parallel General-Purpose Synthetic Data Generator1
+- https://link.springer.com/chapter/10.1007/978-1-4419-0176-7_6
+
+Automatically extracting mock object behavior from Design by Contract™ specification for test data generation
+- https://dl.acm.org/doi/abs/10.1145/1808266.1808273
+
+
+
+Google Scholar Searches:
+
+https://scholar.google.com/scholar?start=20&q=related:ZBjVUf3o5k4J:scholar.google.com/&hl=en&as_sdt=0,5&scioq=random+test+data+generation
+https://scholar.google.com/scholar?start=20&q=related:U6WYuKE9bvoJ:scholar.google.com/&hl=en&as_sdt=0,5&scioq=random+test+data+generation
+https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=random+test+data+generation&btnG=
+
+
+
+
+== Nicht nützlich; zu kompliziert:
+
+Test data generation based on a formal analysis of the project configuration data
+- https://link.springer.com/article/10.3103/S0146411611070030
+
+A novel strategy for automatic test data generation using soft computing technique
+- https://link.springer.com/article/10.1007/s11704-014-3496-9
+
+Test Data Generation for Programs with Quantified First-Order Logic Specifications
+- https://link.springer.com/chapter/10.1007/978-3-642-16573-3_12
+
+A Test Data Generation Tool for Unit Testing of C Programs
+- https://ieeexplore.ieee.org/abstract/document/4032275
+
+A System to Generate Test Data and Symbolically Execute Programs
+- https://ieeexplore.ieee.org/abstract/document/1702368
+
+Search-based software test data generation: a survey
+- https://onlinelibrary.wiley.com/doi/abs/10.1002/stvr.294
+
+Contributions to Program- and Specification-based Test Data Generation
+- https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.63.843&rep=rep1&type=pdf
+
+Automated software test data generation
+- https://ieeexplore.ieee.org/abstract/document/57624
+
+Search-based software test data generation for string data using program-specific search operators
+- https://onlinelibrary.wiley.com/doi/abs/10.1002/stvr.354
+
+Survey on test data generation tools
+- https://link.springer.com/article/10.1007/s10009-013-0272-3
+
+Quantifying the Characteristics of Java Programs That May Influence Symbolic Execution from a Test Data Generation Perspective
+- https://ieeexplore.ieee.org/abstract/document/6899216
+
+A Complete Automation of Unit Testing for Java Programs
+- https://scholarworks.utep.edu/cs_techrep/234/
+
+Feedback-Directed Random Test Generation
+- https://ieeexplore.ieee.org/abstract/document/4222570
+
+An empirical study to quantify the characteristics of Java programs that may influence symbolic execution from a unit testing perspective
+- https://www.sciencedirect.com/science/article/abs/pii/S0164121216000868
+
+
+Google Scholar Search:
+- https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=test+data+generation+strategy&oq=test+data+generation+
+
+- Automated Testing
