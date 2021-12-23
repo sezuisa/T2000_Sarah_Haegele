@@ -1,47 +1,32 @@
-%!TEX root = ../../main.tex
+\chapter{Einführung}\label{ch:einfuehrung}
+- Eine hohe Qualität und Stabilität von Software wird in der heutigen Zeit immer wichtiger
 
-\chapter{Das erste Kapitel}
-Dies ist der Text des ersten Kapitels.Nur erwähnte Literaturverweise werden auch im Literaturverzeichnis gedruckt: \cite[S.12 ff]{baumgartner:2002}, \cite[S.1-3]{dreyfus:1980}
+- Cyberkriminalität so hoch wie nie - oft werden Fehler in einer Software ausgenutzt (Beispiel)
 
-Meine erste Fußnote\footnote{Ich bin eine Fußnote} darf auch nicht fehlen. Fußnoten sind dazu da, dass man Begriffe näher erklärt, die aber dem vertrauten Leser wahrscheinlich eh bekannt sind. 
+- Auch abseits von Cyberkriminalität kann fehlerhafte Software immense Auswirkungen haben, sowohl auf den Anwender (Beispiel) als auch auf den Ruf des Unternehmens, das die Software entwickelt (Beispiel).
 
-\begin{figure}[h]
-\centering
-\includegraphics[height=.8\textwidth]{logo.png}
-\caption{Das Logo der Musterfirma\footnotemark}
-\end{figure}
+- Wie wird also die Sicherheit und Qualität von Software sichergestellt? Durch Testen.
 
 
+\section{Die Firma FNT}\label{sec:fnt}
+Die \textit{\companyName{}} ist ein Unternehmen aus Ellwangen an der Jagst, welches als Marktführer in diesem Bereich Softwarelösungen für die Verwaltung von IT-, Rechenzentrums- und Telekommunikationsinfrastrukturen für Kunden weltweit entwickelt. \cite{fnt:2021} Das wohl bekannteste Produkt der Firma stellt die Software \textit{FNT Command} dar. Mit dieser Software können Kunden ihre gesamte IT-Infrastruktur übersichtlich an einem Ort erfassen, planen und verwalten, was gerade in Anbetracht des rasanten Wachstums solcher Infrastrukturen (QUELLE) ein immer wichtigeres Investment für viele Firmen darstellt. Der langjährige Erfolg und die vielversprechenden Zukunftsaussichten der \textit{\companyName{}} zeigen sich nach außen hin gerade durch das kontinuierliche Wachstum der Firma seit ihrer Gründung im Jahr 1994.
 
-%\begin{wrapfigure}{r}{.4\textwidth}
-%\centering
-%\includegraphics[height=.35\textwidth]{logo.png}
-%\vspace{-15pt}
-%\caption{Das Logo der Musterfirma\footnotemark}
-%\end{wrapfigure}
-%Quelle muss in Fußnote stehen (da sonst aufgrund eines Fehlers nicht kompiliert
-% wird)
-\footnotetext{aus \cite{mustermann:2012}}
-Looking for the one superhero comic you just have to read. Following the antics and adventures of May Mayday Parker, this Spider-book has everything you could want in a comic--action, laughs, mystery and someone in a Spidey suit. Collects Alias \#1-28, What If. Jessica Jones had Joined the Avengers. In her inaugural arc, Jessicas life immediately becomes expendable when she uncovers the potentially explosive secret of one heros true identity. In her inaugural arc, Jessicas life immediately becomes expendable when she uncovers the potentially explosive secret of one heros true identity.
+\section{Problemstellung und Motivation}\label{sec:motivation}
+- Software, die an Kunden ausgeliefert wird, soll qualitativ hochwertig und zuverlässig sein, hierfür existiert ist ein eigener Bereich im Unternehmen, welcher auf QA fokussiert ist 
 
-Manchmal braucht man auch Formeln. LaTeX hat einen sehr guten Formeleditor, der eigentlich selbsterklärend ist. Die Formeln weden automatisch nummeriert, aber man kann immer im Text mit einem Label wie Formel \ref{xyz} Bezug nehmen.
+- Das ausführliche Testen von Software hat daher bei FNT einen hohen Stellenwert.
 
-\begin{equation}
-t-t_{0}=\sqrt{\frac{l}{g}}\int_{0}^{\varphi}{\frac{d\psi}{\sqrt{1-k^{2}\sin^{2} {\psi}}}} = \sqrt{\frac{l}{g}} F(k,\varphi)
-\label{xyz}
-\end{equation}
+- In vielerlei Bereichen kommen bei FNT automatisierte Tests zum Einsatz. Diese bieten den Vorteil, dass bei Übernahme von Änderungen in den Hauptcode direkt automatisch ein Reihe von Tests durchgeführt wird und so ohne großen manuellen Testaufwand bestimmt werden kann, ob durch eine Codeänderung Funktionalitäten der Software beeinträchtigt wurden.
 
-Manchmal braucht man Aufzählungen, die man in einzelnenen Punkten aufführt.
-\begin{itemize}
-\item Dies ist der erste Punkt, der aufgeführt wird.
-\item Dies ist der zweite Punkt, der aufgeführt wird. Manchmal will man auch etwas \textbf{fett} oder \textit{kursiv} oder \textbf{\textit{beides in Kombination}}  drucken.
-\item Dies ist der dritte Punkt, der aufgeführt wird.
-\end{itemize}
+- Auch für das \ac{CIF} wurde im Jahr 2021 ein Projekt für automatisierte Tests im Rahmen der Bachelorarbeit von Kathrin Ulmer ins Leben gerufen; zuvor wurde dieses noch sehr aufwändig manuell von designierten Tester/innen getestet. Das Testprojekt ist zum Zeitpunkt dieser Arbeit noch relativ neu; viele Testfälle sind daher noch nicht implementiert, jedoch konzeptioniert und auf der Testplattform TestRail detailliert dokumentiert
 
-Once upon a time, Jessica Jones was a costumed super-hero, just not a very good one. First, a story where Wolverine and Hulk come together, and then Captain America and Cable meet up. In a city of Marvels, Jessica Jones never found her niche. The classic adventures of Spider-Man from the early days up until the 90s. Looking for the one superhero comic you just have to read. In her inaugural arc, Jessicas life immediately becomes expendable when she uncovers the potentially explosive secret of one heros true identity.
+- Sowohl beim automatisierten Testprojekt für das \ac{CIF} als auch bei allen anderen automatisierten Tests bei FNT gilt allerdings, dass Testdaten manuell per Hand erstellt werden müssen und nicht auch wie die Tests automatisiert ablaufen bzw. generiert werden. Dies führt dazu, dass ein Großteil der Arbeit bei der Implementierung und Ausführung der Tests darin besteht, Testdaten zu formulieren und aufwändig zu überprüfen, ob diese den Anforderungen der einzelnen Testfälle entsprechen. Auch müssen die Testdaten aufwändig gepflegt werden, da sie statisch in externen Dateien gehalten und somit bei Veränderungen der Beschaffenheit von Objekten in der zu testenden Software manuell eine große Anzahl von Daten über viele Dateien händisch angepasst werden müssen. All dies ist nicht nur aufwändig, sondern auch sehr fehleranfällig, was auch durch eigene Erfahrungen, in Kapitel 3.3 beschrieben, bestätigt werden konnte.
 
-Erste Erwähnung eines Akronyms wird als Fußnote angezeigt. Jede weitere wird
-nur verlinkt: \acf{AGPL}. \cite{fsf:2007}
+- Fehlerhafte Testdaten sind ein ernstzunehmendes Problem, da so die Abdeckung aller Funktionalitäten einer Software durch Tests nicht gewährleistet werden kann. Ein Testfall kann korrekt implementiert, durch unpassende Testdaten allerdings invalidiert werden. Im Bereich der Testdatenerstellung zeigt sich also deutliches Optimierungspotential.
 
-Verweise auf das Glossar: \gls{Glossareintrag}, \glspl{Glossareintrag}
+\section{Abgrenzung des Themas}\label{sec:abgrenzung}
+Im Rahmen dieser Projektarbeit soll das Erstellen von Testdaten für das automatisierte Testprojekt des \ac{CIF} ebenfalls weitestgehend automatisiert werden. Hierbei soll der Fokus auf der Erstellung eines realisierbaren Konzepts liegen und die Umsetzung so weit wie möglich erfolgen, aber keinesfalls einen Anspruch auf Vollständigkeit erheben. Vielmehr soll eine prototypische Realisierung als eine Art \enquote{Proof of Concept} dienen, um so zu zeigen, dass das erarbeitete Konzept auch in der Realität funktional und anwendbar ist. \cite{oed:2021}
 
+\section{Zielsetzung}\label{sec:zielsetzung}
+Das Ziel dieser Projektarbeit ist die Konzeptionierung und prototypische Umsetzung einer automatischen Testdatengenerierung für das automatische Testprojekt des \ac{CIF}. Hierbei sollte es nach einer vollständigen Implementierung des Konzepts möglich sein, nahezu alle bisher manuell durchgeführten Schritte in Verbindung mit Testdaten zu automatisieren und somit obsolet zu machen. Die prototypische Umsetzung sollte so geschehen, dass diese bei Bedarf einfach von einem/einer anderen Entwickler/-in übernommen und fortgeführt werden kann. Das gesamte Vorgehen sollte ausführlich dokumentiert und die Dokumentation allen berechtigten Beschäftigten von FNT zur Verfügung gestellt werden.
+-> CIF wird in Standard übernommen -> CIF wird wichtiger

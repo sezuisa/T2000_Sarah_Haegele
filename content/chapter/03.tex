@@ -1,47 +1,46 @@
 %!TEX root = ../../main.tex
 
-\chapter{Das dritte Kapitel}
-Dies ist der Text des ersten Kapitels.Nur erwähnte Literaturverweise werden auch im Literaturverzeichnis gedruckt: \cite[S.12 ff]{baumgartner:2002}, \cite[S.1-3]{dreyfus:1980}
-
-Meine erste Fußnote\footnote{Ich bin eine Fußnote} darf auch nicht fehlen. Fußnoten sind dazu da, dass man Begriffe näher erklärt, die aber dem vertrauten Leser wahrscheinlich eh bekannt sind. 
-
-\begin{figure}[h]
-\centering
-\includegraphics[height=.8\textwidth]{logo.png}
-\caption{Das Logo der Musterfirma\footnotemark}
-\end{figure}
+\chapter{Ist-Analyse}\label{ch:istanalyse}
 
 
+\section{Automatisiertes Testen bei FNT}\label{sec:autotestsfnt}
+Genereller Aufbau von automatischen Testprojekten - alle folgen einer ähnlichen Struktur. Einbindung Jenkins, Testsuites über Gradle-Tasks - FNT Test Policy, Test Strategy
 
-%\begin{wrapfigure}{r}{.4\textwidth}
-%\centering
-%\includegraphics[height=.35\textwidth]{logo.png}
-%\vspace{-15pt}
-%\caption{Das Logo der Musterfirma\footnotemark}
-%\end{wrapfigure}
-%Quelle muss in Fußnote stehen (da sonst aufgrund eines Fehlers nicht kompiliert
-% wird)
-\footnotetext{aus \cite{mustermann:2012}}
-Looking for the one superhero comic you just have to read. Following the antics and adventures of May Mayday Parker, this Spider-book has everything you could want in a comic--action, laughs, mystery and someone in a Spidey suit. Collects Alias \#1-28, What If. Jessica Jones had Joined the Avengers. In her inaugural arc, Jessicas life immediately becomes expendable when she uncovers the potentially explosive secret of one heros true identity. In her inaugural arc, Jessicas life immediately becomes expendable when she uncovers the potentially explosive secret of one heros true identity.
+Agile Development
+Continuous Integration
 
-Manchmal braucht man auch Formeln. LaTeX hat einen sehr guten Formeleditor, der eigentlich selbsterklärend ist. Die Formeln weden automatisch nummeriert, aber man kann immer im Text mit einem Label wie Formel \ref{xyz} Bezug nehmen.
+\section{Das Projekt \enquote{CIF Automated Tests}}\label{sec:ciftestprojekt}
+Aufbau vom CIF-Testprojekt im Speziellen, Klassenstruktur, Testsuites
 
-\begin{equation}
-t-t_{0}=\sqrt{\frac{l}{g}}\int_{0}^{\varphi}{\frac{d\psi}{\sqrt{1-k^{2}\sin^{2} {\psi}}}} = \sqrt{\frac{l}{g}} F(k,\varphi)
-\label{xyz}
-\end{equation}
+Das automatisierte Testen im Rahmen des Projekts \enquote{CIF Automated Tests} wurde im Jahr 2021 begonnen. Zuvor belief sich das Testen des \ac{CIF} ausschließlich auf manuell durchgeführte Tests, wodurch der Aufwand zum Testen des gesamten Systems sehr hoch und auch ein sehr häufiges und zügiges Testen wie in anderen bereits automatisierten Projekten nicht möglich war. Mit der Integration des \ac{CIF} in die Standardmodule von \textit{Command} bekommt dessen Zuverlässigkeit allerdings einen immer höheren Stellenwert, da das Modul so an eine deutlich größere Zahl von Kunden ausgeliefert wird. Fehler im \ac{CIF} könnten so zu einer Abwertung des gesamten Images der Software führen. Unter diesem Gesichtspunkt sollte mithilfe von automatisierten Tests eine Steigerung der Sicherheit und Qualität des \ac{CIF} erreicht werden.
 
-Manchmal braucht man Aufzählungen, die man in einzelnenen Punkten aufführt.
-\begin{itemize}
-\item Dies ist der erste Punkt, der aufgeführt wird.
-\item Dies ist der zweite Punkt, der aufgeführt wird. Manchmal will man auch etwas \textbf{fett} oder \textit{kursiv} oder \textbf{\textit{beides in Kombination}}  drucken.
-\item Dies ist der dritte Punkt, der aufgeführt wird.
-\end{itemize}
+Das Testprojekt selbst richtet sich nach den in Kapitel \ref{sec:autotestsfnt} beschriebenen vorgegebenen Richtlinien zum automatisierten Testen bei FNT. Getestet wird in zehn verschiedenen Testphasen, welche in ihrer Reihenfolge und Struktur der Philosophie der in Abbildung PYRAMID-REF dargestellten Pyramide für automatisierte Tests folgen. Diese Testphasen, auch Testsuites genannt, werden getrennt voneinander ausgeführt. Das Ausführen einer Testsuite erfolgt über das im Projekt integrierte Build-Automations-Tool \textit{Gradle} durch sogenannte \enquote{Tasks}. 
 
-Once upon a time, Jessica Jones was a costumed super-hero, just not a very good one. First, a story where Wolverine and Hulk come together, and then Captain America and Cable meet up. In a city of Marvels, Jessica Jones never found her niche. The classic adventures of Spider-Man from the early days up until the 90s. Looking for the one superhero comic you just have to read. In her inaugural arc, Jessicas life immediately becomes expendable when she uncovers the potentially explosive secret of one heros true identity.
+\begin{enumerate}
+    \item \textbf{Suite \enquote{apiCommandAlive}}: Es wird ein schneller Check durchgeführt, um zu überprüfen, ob die zu testenden \textit{Command}-Instanz erreichbar ist. Schlägt dieser Check fehl, so wird der Build sofort abgebrochen, da die Erreichbarkeit der Instanz eine Voraussetzung zur Durchführung aller weiteren Tests ist.
+    \item \textbf{Suite \enquote{apiPreconditions}}: In der Precondition-Suite werden einige für die weiteren Tests benötigte Objekte in \textit{Command} angelegt. Dies beinhaltet beispielsweise einen Job, welcher zur Steuerung des Datenintegrationsprozesses nötig ist, und eine sogenannte \enquote{Zone}, also ein virtueller Campus mit einem Gebäude, einer Etage und einem Raum. Diese Zone muss für spätere Tests vorhanden sein, um Geräte darin platzieren zu können.
+    \item \textbf{Suite \enquote{apiSmoke}}: Die Smoke-Suite besteht aus Tests, welche grundlegende Funktionen von \textit{Command} beziehungsweise des \ac{CIF} auf korrekte Funktionalität prüfen. Hierzu gehört sowohl das ausgiebige Testen der Login-Funktion als auch ein erster Check, ob die Deltaberechnung grundsätzlich durchführbar ist. Schlagen Tests in der Smoke-Suite fehl, wird der Build sofort abgebrochen, da bei Fehlern in diesen grundlegenden Funktionen ein weiteres Testen von Komponenten, die oft auf diese Funktionen basieren, sinnlos wäre.
+    \item \textbf{Suite \enquote{apiSetUpEnvironment}}: In dieser Suite wird eine Testumgebung für die darauffolgenden End-To-End-Tests geschaffen. Mithilfe von vordefinierten Testdaten werden Testobjekte so in \textit{Command} und in die \ac{NMS}-Tabelle platziert, dass alle möglichen Deltafälle berechnet werden und in den weiteren Tests getestet werden können.
+    \item \textbf{Suite \enquote{apiRegression}}: Die Regression-Suite dient zur Durchführung von Integrationstests. Hierzu zählt beispielsweise das Erstellen von einzelnen Objekten in der \ac{NMS}-Tabelle.
+    \item \textbf{Suite \enquote{apiRegressionE2E}}: Diese Suite beinhaltet funktionale End-To-End-Tests. Getestet wird hierbei, ob die Deltafälle korrekt berechnet wurden, ob die Deltas genehmigt werden können und in \textit{Command} korrekt synchronisiert werden. Aufgrund der hohen Anzahl von Tests in dieser Suite wurde sie in einzelne Komponenten aufgeteilt:
+    \begin{description}
+        \item[Hardware:] Hardware bezeichnet alle Gerätetypen, beispielsweise Chassis oder Switch Cabinets.
+        \item[Zone:] Die Zonentests betreffen alle Arten von Zonen, zum Beispiel Gebäude oder Räume.
+    \end{description}
+    \item \textbf{Suite \enquote{uiRegression}}: Neben den Tests über die \textit{Command} \ac{API}, die sogenannte \ac{BGE}, werden in dieser Suite grundlegende Tests über die \ac{GUI} von \textit{Command} ausgeführt, um deren Funktionalität zu prüfen.
+    \item \textbf{Suite \enquote{uiRegressionE2E}}: In der UI-E2E-Suite werden End-To-End-Tests über die \ac{GUI} durchgeführt. \ac{GUI}-Tests gibt es im Vergleich zu den \ac{API}-Tests sehr wenig, da diese aufwändig zu implementieren sind und relativ lange in der Testdurchführung dauern.
+    \item \textbf{Suite \enquote{apiCleanEnvironment}}: Die CleanEnvironment-Suite dient zur Überprüfung, ob Objekte aus \textit{Command} auch wieder gelöscht werden können und bereinigt gleichzeitig die zu testende Instanz von allen bei der Testdurchführung erstellten Objekten.
+    \item \textbf{Task \enquote{publishReportToTestRail}}: Der letzte Task bei der Testausführung ist kein Testtask. Stattdessen werden die Ergebnisse des Testlaufs an die Testdokumentationsplattform \textit{TestRail} übermittelt, wo sie grafisch aufbereitet einsehbar sind.
+\end{enumerate}
 
-Erste Erwähnung eines Akronyms wird als Fußnote angezeigt. Jede weitere wird
-nur verlinkt: \acf{AGPL}. \cite{fsf:2007}
+- Tasks werden in einer Datei namens build.gradle definiert und in einer auf Groovy basierenden Skriptsprache geschrieben. Diese Datei und damit die Testtasks werden beim Erstellen eines Builds ausgeführt. Schlägt ein Test fehl, hat das ein Fehlschlagen des gesamten Builds zufolge.
 
-Verweise auf das Glossar: \gls{Glossareintrag}, \glspl{Glossareintrag}
+Die Tests werden in Java implementiert und über die Java-Testplattform \textit{JUnit} ausgeführt. JUnit erlaubt das Verwenden von Annotationen an den einzelnen Tests, beispielsweise um diese einfach in Testsuites zu gruppieren. Gerade diese Annotation kann in den Gradle Tasks genutzt werden, um alle vorhandenen Tests zu filtern und nur die Tests einer bestimmten Testsuite auszuführen. \cite{junit:2021}
 
+\section{Implementierung von Testfällen}\label{sec:testimplementierung}
+Als Einarbeitung in das Testprojekt Implementierung einiger Testfälle. Dabei wurden Testdaten manuell erstellt, was die meiste Zeit in Anspruch nahm und zu sehr vielen Fehlern führte, die korrigiert werden mussten
+
+- Tests haben auf einer älteren Version von Command nicht funktioniert, da dort einer der fest in den JSONs niedergeschriebenen Hardwaretypen gar nicht vorhanden war. 
+
+Buch "QA durch Softwaretests", S. 67: Vorteile von Testdaten in externen Dateien (aber es dreht sich um sehr kleine Systeme)
+S. 311: Manuelle Erstellung von Testdaten kann sehr aufwändig werden

@@ -1,0 +1,38 @@
+== NEXT TO-DOS ==
+
+- Device Master Query needs to work for every possible entity. It needs a "function" query restriction, this is sometimes equal to the command ID of the entity, but also sometimes not (e.g. Cabinet Supplies is CABINET_SUPPLY instead of CABINET_SUPPLIES).
+    -> Maybe there's some way to query the available options from the dropdown field and match one to the entity? (Maybe ask Ruben)
+
+- The CIF-12 branch needs the following for a successful build:
+    - planStatus mustn't be asserted in the tests since it doesn't exist in Cmd 12
+    - Integration tests for nms create, update, delete have to be ignored (possibly via a ExecutionCondition) while the bug with the HTTP 500 "POST not allowed" is still present in Cmd 12
+
+
+== HARDWARE TDG OVERVIEW ==
+
+---
+Delta Cases:
+---
+CREATE - Y
+UPDATE - Y
+DELETE - Y
+UPDATE_TYPE - Y
+PLANNED_CREATE - Y
+PLANNED_CREATE_NOP - Y
+PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE - Y
+PLANNED_DELETE - Y
+PLANNED_DELETE_NOP - Y
+PLANNED_DELETE_WITH_CREATE - Y
+PLANNED_DELETE_WITH_PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE - Y
+PLANNED_DELETE_WITH_PLANNED_CREATE - Y
+PLANNED_DELETE_WITH_PLANNED_CREATE_NOP - Y
+PLANNED_DELETE_WITH_PLANNED_CREATE_NOP_DELETION - Y
+
+---
+Entities:
+---
+Chassis - Y
+NE - N
+Switch Cabinet - N 
+Module - N 
+SFP - N 

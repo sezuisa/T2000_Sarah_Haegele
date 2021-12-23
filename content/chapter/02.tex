@@ -1,62 +1,100 @@
 %!TEX root = ../../main.tex
 
-\chapter{Beispiel Code-schnipsel einbinden}
+\chapter{Grundlagen}\label{ch:grundlagen}
+Dieses Kapitel befasst sich mit einigen Grundlagen, die zum Verständnis dieser Arbeit vonnöten sind. Die zwei nachfolgenden Unterkapitel können von derjenigen Leserschaft, die bereits Erfahrungen mit \textit{Command} und vor allem dem \ac{CIF} hat, übersprungen werden.
 
-%title wird unter dem Bsp. abgedruckt
-%caption wird im Verzeichnis abgedruckt
-%label wird zum referenzieren benutzt, muss einzigartig sein.
+\section{FNT Command}\label{sec:command}
+\textit{FNT Command}, im Folgenden \textit{Command} genannt ist, wie bereits im Kapitel \ref{sec:fnt} erwähnt, eine Software zum Management von IT-, Rechenzentrums- und Telekommunikationsinfrastrukturen. In der Software können ganze Gebäude mit ihrer technischen Infrastruktur bis ins Detail virtuell abgebildet werden. \textit{Command} ermöglicht hierbei die Planung von physischen Gerätetypen, beispielsweise eines Chassis, in einzelnen Räumen eines Gebäudes bis hin zur Dokumentation von logischen Elementen wie Services.
 
-\begin{lstlisting}[caption=Code-Beispiel, label=Bsp.1]
-public class HelloWorld {
-	public static void main (String[] args) {
-		// Ausgabe Hello World!
-		System.out.println("Hello World!");
-	}
-}
-\end{lstlisting}
+\textit{Command} ist eine browserbasierte Anwendung, welche sich in die folgenden drei Schichten gliedert:
 
-%language ändert die Sprache. (Wenn nur eine Sprache verwendet wird, kann diese Sprache in einstellungen.tex geändert werden. Standardmäßig Java.)
-\begin{lstlisting}[caption=Python-Code, label=Python-Code, title=Titel des Python-Codes,language=Python]
-def quicksort(liste):
-if len(liste) <= 1:
-	return liste
-pivotelement = liste.pop()
-links = [element for element in liste if element < pivotelement]
-rechts = [element for element in liste if element >= pivotelement]
-return quicksort(links) + [pivotelement] + quicksort(rechts)
-# Quelle: http://de.wikipedia.org/wiki/Python_(Programmiersprache)
-\end{lstlisting}
+ABBILDUNG
 
-\section{lorem ipsum}
-Looking for the one superhero comic you just have to read. Following the antics and adventures of May Mayday Parker, this Spider-book has everything you could want in a comic--action, laughs, mystery and someone in a Spidey suit. Collects Alias \#1-28, What If. Jessica Jones had Joined the Avengers. In her inaugural arc, Jessicas life immediately becomes expendable when she uncovers the potentially explosive secret of one heros true identity. 
+\begin{itemize}
+    \item \textit{\textbf{Frontend.}} In \textit{TypeScript}, einem Superset\footnote{Als Superset basiert \textit{TypeScript} auf \textit{JavaScript} und wird vollständig zu validem \textit{JavaScript}-Code kompiliert. \cite{ts:2021}} von \textit{JavaScript}, geschrieben, bildet das Frontend die Benutzeroberfläche im Browser ab. Benutzer der Software kommen nur mit dieser Schicht der Software in Berührung.
+    \item \textit{\textbf{Middleware.}} Die Middleware von \textit{FNT Command} wird in \textit{Java} programmiert. Die Programmlogik der Software wird in dieser Schicht abgebildet und es findet eine ständige Kommunikation mit beiden umliegenden Schichten statt.
+    \item \textit{\textbf{Backend.}} Das Backend dient zur dauerhaften Datenspeicherung und wird durch eine \textit{Oracle}-Datenbank dargestellt. Über \textit{\ac{SQL}}-Abfragen können hier Daten direkt aus der Middleware angefordert und bearbeitet werden.
+\end{itemize}
 
-Manchmal braucht man auch Tabellen. Ein Beispiel sieht man in Tabelle \ref{tabelle1}, welche mit einem beliebigen Label bezeichnet werden kann. Die Tabelle taucht dann automatisch im Tabellenverzeichnis auf.
+\section{Das Command Integration Framework}\label{sec:cif}
+Zwar wird von \textit{Command} nach außen hin als eine große Software gesprochen, jedoch besteht diese aus vielen einzelnen und optionalen Custom-Modulen, welche ein Standard-Basismodul um zahlreiche Funktionalitäten erweitern und vom Kunden nur auf Wunsch zu diesem hinzugefügt werden. So können sich mehrere Instanzen von \textit{Command} bei verschiedenen Kunden deutlich unterscheiden. Eines der erwähnten Custom-Module, welches allerdings in Zukunft in das Standardmodul integriert werden soll, ist das \ac{CIF}.
 
-\begin{table}[h!]
-\begin{center}
-\begin{tabular}{ | m{5cm} | m{1cm}| m{1cm} | } 
-\hline
-cell1 dummy text dummy text dummy text& cell2 & cell3 \\ 
-\hline
-cell1 dummy text dummy text dummy text & cell5 & cell6 \\ 
-\hline
-cell7 & cell8 & cell9 \\ 
-\hline
-\end{tabular}
-\end{center}
-\caption{Test der Funktion der Tabelle und ihrer Darstellung}
-\label{tabelle1}
-\end{table}
+Unternehmen speichern in der Realität oft große Mengen an Daten dezentral in unterschiedlichen Softwareprodukten mehrerer Hersteller, was eine Übersicht über diese erschwert und somit ein erhöhtes Risiko für fehlerhaft dokumentierte Daten darstellt. Das \ac{CIF} bietet Nutzern von \textit{Command} die Möglichkeit, Daten aus Fremdsystemen in \textit{Command} zu integrieren und so zentral zu verwalten. Dessen Aufbau ist in der folgenden Abbildung ersichtlich.
 
+ABBILDUNG CIF
 
-Once upon a time, Jessica Jones was a costumed super-hero, just not a very good one. First, a story where Wolverine and Hulk come together, and then Captain America and Cable meet up. In a city of Marvels, Jessica Jones never found her niche. The classic adventures of Spider-Man from the early days up until the 90s. Looking for the one superhero comic you just have to read.
+Das Fundament für die Datenintegration bilden die sogenannten Adapter. Ein Adapter wird genau passend für ein bestimmtes Fremdsystem eines Kunden entwickelt und dient als Schnittstelle zwischen Fremdsystem und \textit{Command}. Als solche ist der Adapter für den sogenannten \textit{ETL}-Prozess verantwortlich. Dies bedeutet, der Adapter führt eine \textbf{E}xtrahierung der Fremddaten durch, woraufhin die \textbf{T}ransformation der Daten in ein von \textit{Command} erkanntes Format erfolgt und somit ein \textbf{L}aden der transformierten Daten in die \textit{Command}-Datenbank durchgeführt kann.
 
-Meet all of Spideys deadly enemies, from the Green Goblin and Doctor Octopus to Venom and Carnage, plus see Peter Parker fall in love, face tragedy and triumph, and learn that with great power comes great responsibility. In a city of Marvels, Jessica Jones never found her niche. Bitten by a radioactive spider, high school student Peter Parker gained the speed, strength and powers of a spider. Looking for the one superhero comic you just have to read. What do you get when you ask the question, What if Spider-Man had a daughter.
+Die nächste Schicht des \ac{CIF} wird durch sogenannte \textit{Staging-Tabellen}, in \textit{Command} \ac{NMS}-Tabellen genannt, abgebildet. Diese dienen zur Zwischenspeicherung von Daten, nachdem diese von einem Adapter geladen wurden. Daten aus einem Fremdsystem werden nicht sofort in \textit{Command} geladen, sondern zuerst in \ac{NMS}-Tabellen zwischengespeichert, um eventuell auftretende Diskrepanzen zwischen den in \textit{Command} bereits vorhandenen und den neu geladenen Daten, sogenannte \textit{Deltas}, zu erkennen und zu bearbeiten. 
 
-The classic adventures of Spider-Man from the early days up until the 90s. Amazing Spider-Man is the cornerstone of the Marvel Universe. But will each partner’s combined strength be enough. Adopting the name Spider-Man, Peter hoped to start a career using his new abilities. Youve found it.
+Das Identifizieren dieser erwähnten Diskrepanzen erfolgt im nächsten Schritt durch die sogenannte Delta-Berechnung. Hier werden die Daten in den \ac{NMS}-Tabellen mit den in \textit{Command} vorhandenen Daten verglichen und die Differenzen in Form von Deltafällen dargestellt. Eine Übersicht über diese Deltas können Nutzer/-innen durch eine Tabelle im Web-Frontend erhalten.
 
-\section{Verweis auf Code}
-Verweis auf den Code \autoref{Bsp.1}.\\
-und der Python-Code \autoref{Python-Code}.
+Für den nächsten Schritt, die Synchronisation der Daten, können Nutzer im Web-Frontend Einträge in der Deltatabelle genehmigen. Die Daten werden daraufhin je nach Deltafall in \textit{Command} erstellt, gelöscht oder aktualisiert.
+ 
+Die Steuerung des beschriebenen Ablaufs zur Datenintegration in \textit{Command} über das \ac{CIF} findet über einen sogenannten Job statt.
+- Erklärung Job
 
-Zweite Erwähnung einer Abkürzung \ac{AGPL} (Erlärung wird nicht mehr angezeigt)
+\section{Software Testing}\label{sec:swtesting}
+Dieses Unterkapitel beschreibt einige theoretische Grundlagen zum Testen von Software und schafft damit eine Basis zum Verständnis des \ac{CIF}-Testprojekts und der darauf basierenden automatischen Testdatengenerierung.
+
+\subsection{Grundsätze des Software Testing}\label{subsec:testinginqa}
+Um effektive Tests für ein System definieren zu können, muss sich ein Tester einiger Grundsätze bewusst sein. Ohne dieses Bewusstsein ist es nur schwer oder gar nicht möglich, Software ausreichend und für das Unternehmen wirtschaftlich lohnend zu testen. Diese folgenden Grundsätze zum Testen von Software gelten für jede Art von Softwaretest.
+\begin{itemize}
+    \item Software wird mit der Intention getestet, Fehler zu finden. \cite[S. 6]{myers:2011}\cite[S. 11]{witte:2019}
+    \item Die völlige Korrektheit von Software kann nicht gezeigt werden, sondern lediglich, dass sie ihre erwünschte Funktion erfüllt. \cite[S. 19]{ammann:2016}\cite[S. 12]{witte:2019}
+    \item Software sollte so früh wie möglich getestet werden. Je früher Fehler in einem System entdeckt werden, desto weniger Aufwand bereitet das Beheben dieser und desto weniger Kosten entstehen für das Unternehmen. \cite[S. 12]{witte:2019} Diese Abhängigkeit der Kosten zu Softwarefehlern in einem fortschreitenden Produktentwicklungsprozess wird durch die folgende Abbildung verdeutlicht.
+\end{itemize}
+
+ABBILDUNG basierend auf \cite[Fig. 1.3]{desikan:2006}
+
+\begin{itemize}
+    \item Wird ein Fehler in einem System gefunden, muss davon ausgegangen werden, dass weitere Fehler auftreten können. Diese treten in der Regel gehäuft in einer einzelnen Softwarekomponente auf und nicht gleichmäßig verteilt auf das ganze System. \cite[S. 13]{witte:2019}
+    \item Tests verlieren auf Dauer ihre Wirksamkeit. Sie müssen daher ständig an das sich stetig verändernde \ac{SUT} angepasst werden. \cite[S. 13f.]{witte:2019}
+    \item Tests müssen nachvollziehbar sein und dokumentiert werden. \cite[S. 14f.]{witte:2019}
+\end{itemize}
+
+Unter diesen Gesichtspunkten wird deutlich, dass Testsuites für jedes \ac{SUT} aktiv geplant und gepflegt werden müssen. Es muss genau definiert werden, welche Testfälle prinzipiell möglich sind und welche davon umgesetzt werden können, um die Kosten für die Testimplementierung und -durchführung im Rahmen zu halten und dabei gleichzeitig für eine bestmögliche Testabdeckung zu sorgen.
+
+\subsection{Verschiedene Konzepte zum Testen von Software}\label{subsec:testkonzepte}
+In Anbetracht der Vielfalt von Software und deren Architektur ist es nicht möglich, mit einer einzigen festen Herangehensweise an das Testen von Software jedwedes zu testende Stück Code abzudecken. Daher sind für diverse Situationen unterschiedliche Testkonzepte und -methoden entstanden. Für einige davon soll im Folgenden eine Übersicht gegeben werden.
+
+\subsubsection*{Whitebox Tests}\label{subsubsec:whitebox}
+Text
+
+\subsubsection*{Blackbox Tests}\label{subsubsec:blackbox}
+Text
+
+\subsubsection*{Greybox Tests}\label{subsubsec:greybox}
+Text
+
+\subsubsection*{Unit Tests}\label{subsubsec:unittest}
+Auch: Modultest. White Box. Wird normalerweise direkt von Entwicklern passend für ihren neuen Code geschrieben. Einzelne Module werden auf korrekte Funktionalität geprüft. \cite[S. 75]{witte:2019}
+
+\subsubsection*{Integrationstests} \label{subsubsec:integrationstests}
+Text
+
+\subsubsection*{Systemtests}\label{subsubsec:e2etests}
+Auch: End-To-End-Tests.
+
+\subsubsection*{GUI-Tests}\label{subsubsec:guitests}
+Text
+
+\subsubsection*{Akzeptanztests}\label{subsubsec:akzeptanztests}
+Text
+
+\subsubsection*{Manuelles Testen}\label{subsubsec:manuelltest}
+Text
+
+\subsubsection*{Automatisiertes Testen}\label{subsubsec:autotest}
+Test Automation Pyramid; harmoniert mit agilem Entwicklungsprozess \cite{contan:2018}
+
+ABBILDUNG TEST PYRAMID ERSTELLEN
+
+\subsection{Die Bedeutung von Testdaten für effektives Software Testing}\label{subsec:testdaten}
+Idee wegen Literatur: Diverse Literaturbeispiele nehmen, überall wird erwähnt, dass Tests mit PASSENDEN Testdaten ausgeführt werden. Daraus folgt, dass Tests mit unpassenden Daten nicht durchgeführt werden können bzw. fehlschlagen und den Test damit invalidieren. Das ist ja auch logisch, denn man kann nichts auf Basis von fehlerhaften oder gar nicht der Situation entsprechenden Daten testen. Im Fall FNT: Wenn ein Deltafall "CREATE" getestet werden soll, können hierfür keine Testdaten verwendet werden, die den Deltafall "UPDATE" erzeugen, denn dann wird die "CREATE"-Operation gar nicht erst ausgeführt und ein wichtiger Teil der Software wird nicht getestet. Testdaten haben daher einen hohen Stellenwert für die Qualität der Softwaretests allgemein, da sie die Basis darstellen, ohne die Tests gar nicht erst ausgeführt werden können oder deren Ergebnisse unbrauchbar sind. Im schlimmsten Fall könnte der Test sogar ein falsches Positiv erzeugen, was eine nicht gegebene Sicherheit vermittelt und einen eventuellen Fehler verschleiert.
+
+\enquote{\textit{In general, the least effective methodology of all is random-input
+testing—the process of testing a program by selecting, at random, some
+subset of all possible input values. In terms of the likelihood of detecting
+the most errors, a randomly selected collection of test cases has little
+chance of being an optimal, or even close to optimal, subset.}} \cite[S. 41]{myers:2011}

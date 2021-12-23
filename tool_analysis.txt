@@ -1,0 +1,10 @@
+== Toolanalyse ==
+
+Es wurde sich vorerst gegen die Verwendung eines Third-Party-Tools entschieden. Gründe:
+
+- Kein Tool vorhanden, das alles abdeckt, was benötigt wird
+- Trotz lediglich Teilabdeckung: Tools oft sehr umfangreich und groß, vieles dabei, was nicht benötigt wird oder nicht verwendbar ist
+- Bei Tools, die einzelne Funktionalitäten mitbringen, welche nützlich sein könnten: Es lohnt sich nicht, für eine so kleine Funktionalität ein externes Tool einzubinden und sich darin einzulernen, was oft zu Verkomplizierungen führt, daher besser, diese kleinen Dinge direkt selbst zu implementieren (Bsp.: Generierung eines zufälligen Wertes)
+- Bei externen Tools von deren Support abhängig, bei selbst entwickeltem Code nicht, dort kann selbst gewartet und eingegriffen - und ggf. verbessert - werden
+- Eigene Implementierung bietet Spielraum zur Erweiterung und Änderung; Fremdsoftware nur sehr eingeschränkt. Es ist möglich, dass mit einer neuen Anforderung an die Testdaten das bisher verwendete externe Tool nicht mehr auf den benötigten Fall anwendbar ist und so oder so selbst die Funktionalität implementiert werden muss.
+- 

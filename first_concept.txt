@@ -1,16 +1,23 @@
 == Schritt-für-Schritt-Beschreibung eines möglichen Ablaufs (Beispielhaft für Hardware) ==
 
-1) Erstellen von XML-Dateien, welche die Anforderungen an die gewünschten Testdaten beschreiben
-    - Separate Datei für Device, Service, Zone&Common&Dynamic&DataCable, NMS Operations -> für jede Test Suite eine Konfigurationsdatei
+1) Erstellen von CSV/JSON-Dateien, welche die Anforderungen an die gewünschten Testdaten beschreiben
+    - Separate Datei für Hardware, Service, Zone&Common&Dynamic&DataCable, NMS Operations -> für jede Test Suite eine Konfigurationsdatei
     - Entitäten (Chassis, NE, Switch Cabinet, Module, SFP, ...)
     - Pro Entität Deltafälle (CREATE, PLANNED_DELETE, ...)
 
-2) Parsen der XML-Datei
+    oder
+    - Deltafälle, dabei angeben, welche Entitäten diesen Fall benötigen
+
+2) Parsen der Datei
     - Speichern in LinkedHashMap: Key - Value -> Entity - List<DeltaCase>
     - Erste Inputvalidierung: Überprüfung, ob die angegebenen Entitäten und Deltafälle überhaupt existieren, bzw. korrekt sind -> Exceptions
     - Je nach Art der Entitäten (Hardware, Service, ...) wird eine entsprechende Methode zur Datengenerierung aufgerufen
 
-Hadrware-Datengenerierung:
+Hardware-Datengenerierung:
+Generelle Konstanten, die zuerst gesetzt werden:
+    - sourceSystem
+    - Zone -> nach dem Erstellen Elid des Rooms für createLinkedZone->linkedElid bei Command Objekten und für nms Objekte über die Attribute "floor", "building" und "campus" die nmsZoneId zusammensetzen (CIF_PRE_AUTO_TEST_CAMPUS|CIF_AUTO_TEST_BUILDING|CIF_AUTO_TEST_FLOOR|CIF_AUTO_TEST_ROOM)
+
 3) Iteration über die Map
     - Listen mit CommandObject-Objekten, die nach den Iterationen in Command zur Objekterstellung genutzt werden:
         - commandData
@@ -26,6 +33,8 @@ Hadrware-Datengenerierung:
 
     - Innere Schleife über die Deltafälle
     - Restrictions für die Fälle zunächst auch statisch speichern (z.B. in Map: Key - Value -> CREATE - {1, "nms"} oder PLANNED_CREATE - {2, "nms,planningCreate"} oder PLANNED_DELETE_WITH_PLANNED_CREATE - {4, "nms,planningCreate,command,planningDelete"})
+    - Wenn im Deltafall "TYPE" oder "PLANNED" + "WITH" vorkommt -> 2 versch. Typen 
+    - Für den Deltafall PLANNED_DELETE_WITH_PLANNED_CREATE_BUT_WITH_DEFFERENT_TYPE 3 versch. Typen
     - Wenn Anzahl der zu erstellenden Objekte > 1, dann wird die visibleId für alle Objekte zwischengespeichert und wiederverwendet
 
     Werte generieren
@@ -35,8 +44,8 @@ Hadrware-Datengenerierung:
             - nmsId & visibleId mit Parameter generieren (Entity name & delta case in all-caps) -> TEST_ENTITY_DELTACASE
             - Remark ähnlich wie visibleId -> Test nms [Entity] [DeltaCase]
             - IP 
-            - nmsType & commandType
-            - nmsSourceSystem & cSourceSystem & sourceSystem 
+            - nmsType & commandType -> vor der einzelnen Datengenerierung zuerst von Command abfragen, welche Typen existieren, dann davon drei nehmen (drei sind notwendig, um alle Deltafälle abzudecken) -> jeweils vor allen Daten vom Typ Chassis, Switch Cabinet, NE, Module, SFP
+            - nmsSourceSystem & cSourceSystem & sourceSystem -> wird vor der Datengenerierung abgeprüft und evtl. erstellt
             - serialNo
             - 
 
@@ -56,3 +65,7 @@ Hadrware-Datengenerierung:
         - zusätzlich ein Chassis, welches mit dem Module bzw. SFP kompatibel ist (neues Testchassis nur für Module & SFP Tests)
     - Wenn für das Objekt die Preconditions erfüllt sind, kann es über die BGEs erstellt werden
 
+
+Nächste Schritte...
+
+Implementation für eine Entität (Chassis), hierbei erstmal auf einen Deltafall und auf ein generiertes Attribut beschränken (z.B. type). Preconditions als gegeben ansehen. -> schauen, dass das Grundgerüst funktioniert
