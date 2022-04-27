@@ -59,7 +59,13 @@ Unter diesen Gesichtspunkten wird deutlich, dass Testsuites für jedes \ac{SUT} 
 In Anbetracht der Vielfalt von Software und deren Architektur ist es nicht möglich, mit einer einzigen festen Herangehensweise an das Testen von Software jedwedes zu testende Stück Code abzudecken. Daher sind für diverse Situationen unterschiedliche Testkonzepte und -methoden entstanden. Für einige davon soll im Folgenden eine Übersicht gegeben werden.
 
 \subsubsection*{Whitebox Tests}\label{subsubsec:whitebox}
-Text
+Werden auch als strukturelle Tests bezeichnet, da hierbei die interne Struktur des \ac{SUT} als Testbasis dient. Dies bedeutet, dass das System beim Testen völlig transparent und der Programmcode für die zu testende Programmfunktionalität einsehbar ist und so bestimmte Codezweige gezielt getestet werden können. Whitebox Tests sind hierbei als Überbegriff für sämtliche Testverfahren anzusehen, welche ihre Tests direkt auf dem Code basieren. Dazu zählen beispielsweise Unit Tests, welche im weiteren Verlauf separat erläutert werden sollen.
+
+Whitebox Testing erlaubt es, ein System sehr gründlich und tiefgreifend zu testen, da spezielle Verzweigungen angezielt werden können. Es können somit vielerlei Fehler sehr früh entdeckt werden. Weiterhin ist diese Methode für die Optimierung von Code durchaus förderlich, da Bottlenecks (EXPLANATION) frühzeitig erkannt werden können. Whitebox Tests sind ferner relativ einfach zu automatisieren (EXPLANATION + CITATION) und ermöglichen eine Rückverfolgung der Tests vom Code aus, um dortige Änderungen einfach in neuen Tests zu erfassen (CITATION, EXPLANATION?).
+
+Die starke Fixierung auf die Struktur eines \ac*{SUT} bringt allerdings auch Nachteile mit sich. So schlagen Whitebox Tests schnell fehl, wenn an der Implementation einer Funktionalität Änderungen durchgeführt werden. Die Tests müssen also mit dem Code geupdatet und gewartet werden. Eng hiermit verbunden besteht die Gefahr, dass bei einer neuen Implementierung, welche an der Funktionalität selbst nichts verändert, Testergebnisse fälschlischerweise positiv angezeigt werden und so tatsächliche Fehler verschleiern. Whitebox Tests können außerdem den Testprozess verkomplizieren, da sie ein bestimmtes Grad an Know-How und Vertrautheit mit dem zu testenden Code erfordern. Schließlich decken Whitebox Tests nur den Ist-Zustand eines Systems ab und stellen so nicht sicher, dass jede geforderte Funktionalität eines Systems vorhanden ist.
+
+VIELLEICHT ALS BULLET POINTS?
 
 \subsubsection*{Blackbox Tests}\label{subsubsec:blackbox}
 Text

@@ -1,8 +1,5 @@
 == NEXT TO-DOS ==
 
-- Device Master Query needs to work for every possible entity. It needs a "function" query restriction, this is sometimes equal to the command ID of the entity, but also sometimes not (e.g. Cabinet Supplies is CABINET_SUPPLY instead of CABINET_SUPPLIES).
-    -> Maybe there's some way to query the available options from the dropdown field and match one to the entity? (Maybe ask Ruben)
-
 - The CIF-12 branch needs the following for a successful build:
     - planStatus mustn't be asserted in the tests since it doesn't exist in Cmd 12
     - Integration tests for nms create, update, delete have to be ignored (possibly via a ExecutionCondition) while the bug with the HTTP 500 "POST not allowed" is still present in Cmd 12
@@ -36,3 +33,7 @@ NE - N
 Switch Cabinet - N 
 Module - N 
 SFP - N 
+CABINET_SUPPLIES - Y
+CLIENT - Y
+DATA_SOCKET - Y
+DEVICE_MISC - Y

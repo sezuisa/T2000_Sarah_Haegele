@@ -1,0 +1,146 @@
+{
+    "deltaCases": [
+        {
+            "CREATE": {
+                "entities": [
+                    "Chassis",
+                    "Network Element",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "UPDATE": {
+                "entities": [
+                    "Chassis",
+                    "Network Element",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "DELETE": {
+                "entities": [
+                    "Chassis",
+                    "Network Element",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "UPDATE_TYPE": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_CREATE": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_CREATE_NOP": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_DELETE": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_DELETE_NOP": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_DELETE_WITH_CREATE": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_DELETE_WITH_PLANNED_CREATE_BUT_WITH_DEFFERENT_TYPE": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_DELETE_WITH_PLANNED_CREATE": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_DELETE_WITH_PLANNED_CREATE_NOP": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        },
+        {
+            "PLANNED_DELETE_WITH_PLANNED_CREATE_NOP_DELETION": {
+                "entities": [
+                    "Chassis",
+                    "Switch Cabinet",
+                    "Module",
+                    "SFP"
+                ]
+            }
+        }
+    ]
+}

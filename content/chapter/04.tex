@@ -1,13 +1,126 @@
 \chapter{Soll-Zustand}\label{ch:sollzustand}
-
+In diesem Kapitel wird auf Basis des analysierten Ist-Zustands ein Lösungskonzept für die Testdatengenerierung in automatisierten Tests für das \ac{CIF} erarbeitet und vorgestellt.
 
 \section{Anforderungsanalyse}\label{sec:anforderungen}
+Um mit dem Projekt der automatischen Testdatengenerierung einen effektiven Mehrwert für FNT bieten zu können, muss zunächst analysiert werden, welchen Anforderungen es entsprechen soll. Diese Anforderungen setzen einen Rahmen und bezeichnen einige erste Regeln und Wegweiser für die spätere Erstellung eines konkreten Lösungskonzepts, sodass dieses nachhaltig das Ziel des Projekts verwirklichen kann, eine nahezu vollständige Automatisierung der Tests durch generierte Testdaten zu erreichen.
 
+- Testdatengenerierung vor den Tests, sodass diese bei Ausführung der Tests abrufbar sind
+
+- Testdaten für sämtliche testdatenbezogene Tests des CIF sollen automatisch generiert werden (so weit wie möglich)
+
+- Testdaten sollen automatisch nach der Testausführung wieder gelöscht werden
+
+- Das Projekt muss gut dokumentiert sein, um es einfach nachvollziehen, erweitern oder warten zu können
+
+- Direkte Einbindung in das bestehende Testprojekt - "läuft das Testprojekt, läuft auch die Datengenerierung"
+
+- Keine erheblichen Performance-Einbußen (mit leichten Einbußen durch die benötigte Zeit zur Datengenerierung ist zu rechnen)
+
+- Es sollten nur so viele Testdaten und nur so detailreich wie nötig generiert werden, um Performance und Komplexität zu optimieren
+
+- Es sollten nach der Implementation nahezu keine händischen Schritte in Bezug zu Testdaten mehr nötig sein
 
 \section{Analyse der benötigten Testdaten}\label{sec:testdatenanalyse}
+Im nächsten Schritt erfolgt eine Analyse des \acf{SUT}. Es muss genau festgehalten werden, welche Arten von Testdaten benötigt werden und in welcher Anzahl. Ebenso muss deren Beschaffenheit und erforferliches Verhalten zum Erzielen des gewünschten Programmablaufs berücksichtigt und dokumentiert werden. 
 
+Hierfür wurde eine Testdatenmatrix (s. Anhang \ref{app:testdatamatrix}) erstellt, in welcher sämtliche benötigten Testdaten erfasst werden können. Die Gesamtmatrix setzt sich aus fünf in einzelnen Seiten organisierten Teilmatrizen zusammen, welche jeweils die Testdaten für eine bestimmte Gruppe von Testobjekten beschreiben. Diese Gruppierung dient dem einfacheren Überblick und erlaubt es, Testobjekte mit ähnlichem Verhalten zusammenzufassen.
+
+Die Teilmatrix \enquote{Device Data} ist die umfangreichste Testdatenmatrix und soll für die spätere prototypische Realisierung des Projekts die größte Rolle spielen. In ihr sind verschiedene in \textit{Command} mögliche zu testende Gerätetypen abgebildet, beispielsweise die Typen \enquote{Chassis}, \enquote{Network Element} und \enquote{Switch Cabinet}. Diese Gerätetypen können in \textit{Command} in eine Zone, also einen Campus, ein Gebäude, ein Stockwerk oder einen Raum platziert werden und über das \ac{CIF} entsprechend verschiedener Deltafälle aktualisiert oder gar gelöscht werden. Ebenfalls können Gerätetypen in eine \ac{NMS}-Tabelle geladen werden, um die Datenintegration von einem Fremdsystem darzustellen. Das Ziel der Testdaten ist es zunächst, die Geräte in einem für \textit{Command} validen Format abzubilden, sodass diese überhaupt platziert werden können, beziehungsweise valide für die \ac{NMS}-Tabelle des Gerätetyps, um die Daten in diese laden zu können. Dieser Vorgang wird in Kapitel \ref{sec:loesungskonzept} näher erläutert. Darauf aufbauend sollen die Testdaten genau die in der Matrix definierten Deltafälle auslösen, sodass die Deltaberechnung des \ac{CIF} verlässlich getestet werden kann. Um dies zu erreichen, müssen die Daten veschiedene Anforderungen erfüllen. Diese Anforderungen werden in der Testdatenmatrix durch die Spalten \enquote{NMS} und \enquote{Command} beschrieben und richten sich nach den offiziellen für \textit{Command} definierten Deltafall-Spezifikationen (REFERENZ!!!!!).
+
+Ein \enquote{X} in der Spalte \enquote{NMS} bedeutet, dass für das Auslösen des betrachteten Deltafalls ein Objekt in der zugehörigen \ac{NMS}-Tabelle vorhanden sein muss. Etwas Ähnliches gilt für die Spalte \enquote{Command}; hier bezeichnet das \enquote{X} ein in \textit{Command} platziertes Objekt.
+
+Nur mit Vorhandensein eines Objekts in den benötigten Tabellen sind die Anforderungen an die meisten Deltafälle allerdings nicht erfüllt. Zunächst ist zu beachten, dass für jeden Deltafall, bei dem mehrere Objekte in verschiedenen Tabellen gleichzeitig vonnöten sind, die Objekte ein Attribut aufweisen müssen, mit dem sie bei der Deltaberechnung erkannt und gruppiert werden können. Dieses Attribut wird bei den Geräten durch die sogenannte \enquote{Visible ID} dargestellt. Diese muss für die Erkennung eines bestimmten Deltafalls für alle zugehörigen Objekte, obgleich sie in verschiedenen Tabellen gespeichert sind, identisch sein.
+
+Weiterhin müssen die Testobjekte für manche Deltafälle unterschiedliche Attributwerte aufweisen und für andere Deltafälle wiederum identisch sein. Hierfür kann das Symbol \enquote{X} auch Erweiterungen tragen; die kleinen Buchstaben \enquote{a}, \enquote{b} oder \enquote{c} hinter dem \enquote{X} bezeichnen hierbei, dass es sich bei den Objekten \enquote{Xa}, \enquote{Xb} und \enquote{Xc} um Objekte mit gleicher Visible ID, aber unterschiedlichen Attributen handelt.
+
+Schließlich müssen sich zum Testen der Plan-Deltafälle manche Objekte in \textit{Command} in einem Planstatus, entweder \enquote{PLANNED\_DELETED} oder \enquote{PLANNED\_CREATED}, befinden. Dies wird durch eine weitere Ergänzung des \enquote{X}-Symbols dargestellt. Ein \enquote{-} bezeichnet ein Objekt mit Planstatus \enquote{PLANNED\_DELETED}, während ein \enquote{+} den Status \enquote{PLANNED\_CREATED} abbildet.
 
 \section{Analyse der benötigten Tools}\label{sec:toolanalyse}
+Eine umfassende Analyse der bestehenden Tool-Landschaft vor dem ersten Entwurf eines Konzepts ist immer sinnvoll. Besteht die Möglichkeit, ein bereits existierendes Software-Tool für einen Teil der geplanten Funktionalitäten oder gar für das komplette geplante Projekt zu verwenden, können eine Vielzahl von Ressourcen eingespart werden. 
 
+- Zeit (die für die Entwicklung eines In-House Tools nötig wäre)
+
+- Kapital (sofern Drittanbietertool günstiger ist als das In-House Development eines passenden Tools. Hier ist \ac{OSS} sehr attraktiv, da diese kostenlos ist, aber: \ac{OSS} beinhaltet Risiken - TO ADD)
+
+\subsubsection*{Detailgrad der Analyse}\label{toolanalysedetail}
+Zunächst: Den Scope des Projekts erfassen. Es ist wichtig, bei der Toolanalyse zu wissen, mit wie vielen Benutzern das geplante Programm in Berührung kommen soll, um den Detailgrad der Analyse abzustimmen. Eine überaus formelle und detaillierte Toolanalyse für ein Programm, welches nur von einzelnen Personen verwendet wird, würde unnötig viel Aufwand bereiten, während genau dies für ein sehr großes Projekt definitiv notwendig ist. Ein potentielles Tool muss dabei exakt zu den aufgestellten Anforderungen passen. \cite[S. 249]{fewster:1999} Im Fall der automatischen Datengenerierung für die automatisierten Tests des \ac{CIF} gilt, dass die Tests zwar nur von einigen wenigen Entwicklern ausgeführt werden. Jedoch bilden sie die Basis zur Validierung der korrekten Funktion des \ac{CIF}, welches wiederum von vielen Kunden und deren Mitarbeitern verwendet wird. Das Projekt betrifft so indirekt eine große Anzahl von Nutzern; es sollte also eine ausführliche und detaillierte Toolanalyse durchgeführt werden.
+
+\subsubsection*{Formulieren der Anforderungen an ein Tool}\label{toolanalyseanforderungen}
+Bevor überhaupt nach einem Tool gesucht werden kann, müssen Anforderungen an dieses formuliert werden, denn diese bilden den Vergleichspunkt für verschiedene Software-Tools und sind entscheidend dafür, ob ein Tool in das geplante Projekt integriert werden soll oder nicht. Wird ein Tool ausgewählt, ohne dieses zuvor auf verschiedene Anforderungen für die Funktionalität des Projekts zu prüfen, kann es sein, dass ein unpassendes Tool ausgewählt wird, welches in der Umgebung des Projekts nicht wie geplant oder überhaupt nicht funktioniert und so die Umsetzung des Projekts erschwert. \cite[S. 249]{fewster:1999} Gerade, da solche Komplikationen oft erst während der Umsetzung auftreten, sind diese dann nur sehr aufwändig zu beheben und damit ein großer Kostenfaktor. (QUELLE) 
+
+Taheri und Sadjadi formulieren einige grundsätzliche Kriterien, die bei der Auswahl eines Softwaretools berücksichtigt werden sollten. Zwar sind diese im Kontext der Analyse von Tools zur agilen Entwicklung formuliert, jedoch können viele davon auch allgemein verstanden und somit ebenso auf den hier relevanten Themenbereich der automatischen Testdatengenerierung angewandt werden.
+
+\begin{itemize}
+    \item \textbf{Flexibilität}: Ein Tool sollte flexibel sein und sich den wandelbaren Anforderungen des Unternehmens anpassen können.
+    \item \textbf{Benutzerfreundlichkeit}: Das Tool sollte einfach integrierbar und ohne lange Einarbeitungszeit benutzbar sein.
+    \item \textbf{Kosten}: Der Kostenfaktor spielt eine wichtige Rolle in der Auswahl eines passenden Tools.
+    \item \textbf{Responsivität}: Responsivität bezeichnet die Verfügbarkeit von Support und die Reaktivität des Herstellers eines Tools. Ist dies gegeben und wie wird auf Anfragen von Kunden reagiert?
+    \item \textbf{Features}: Ein passendes Tool sollte Features beinhalten, die für das geplante Projekt einsetzbar sind.
+\end{itemize}
+\cite{taheri:2015}
+
+Im speziellen Kontext der automatischen Datengenerierung ergeben sich für ein potentielles Tool also folgende Anforderungen beziehungsweise Kriterien:
+
+\begin{itemize}
+    \item Datengenerierung muss einfach anpassbar sein, falls sich Funktionalitäten in \textit{Command} ändern (z.B. neue Entitäten, neue Attribute)
+    \item Tool sollte ohne größeren Aufwand direkt in die Umgebung der \ac{CIF} Automated Tests eingebunden werden können (und keine extra-Applikation sollte nötig sein)
+    \item Das Tool sollte, wenn möglich, keine Softwarekosten verursachen (keine Proprietäre Software mit hohen Lizenzkosten), da es nur für ein einzelnes Projekt eingesetzt wird
+    \item Ein verlässlicher Support sollte vorhanden sein, da von der Korrektheit der Datengenerierung die Effektivität der automatischen Tests abhängt und Fehler hier schnell behoben werden sollten
+    \item Tool soll in eine Jenkins-Build-Pipeline einbindbar sein beziehungsweise kompatibel mit Gradle
+    \item Testdaten sollen reale Daten in Command imitieren (z.B. ein Chassis) und müssen hierbei korrekt formatiert werden können
+    \item Generierte Daten müssen Vorgaben zur Deltaberechnung erfüllen können (s. Kapitel \ref{sec:testdatenanalyse})
+    \item Daten sollen nicht direkt in die Datenbank gespeichert werden, sondern über die Middleware verwaltbar und somit kompatibel mit Java und \ac{REST}-Interfaces sein, da auch die Funktionalität des Erstellens von Objekten in \textit{Command} getestet werden soll; Objekte sollen also nur über \ac{REST}-Anfragen der \ac{BGE} erstellt werden
+\end{itemize}
+
+\subsubsection*{Auswahl potentieller Tools zur Datengenerierung}\label{toolanalysauswahl}
+Nach ausführlicher Recherche wurden aus der Vielzahl von verfügbaren Tools zur Datengenerierung vier Generatoren ausgewählt, welche nun näher analysiert werden sollen.
+
+- Databene Benerator
+
+- Mockaroo
+
+- Data Factory
+
+- Java Faker
+
+\subsubsection*{Evaluierung der Tools}\label{toolanalysevaluierung}
+Es wurde sich gegen die Verwendung eines Drittanbietertools entschieden. Gründe:
+
+- Kein Tool vorhanden, das alles abdeckt, was benötigt wird
+
+- Trotz lediglich Teilabdeckung: Tools oft sehr umfangreich und groß, vieles dabei, was nicht benötigt wird oder nicht verwendbar ist
+
+- Bei Tools, die einzelne Funktionalitäten mitbringen, welche nützlich sein könnten: Es lohnt sich nicht, für eine so kleine Funktionalität ein externes Tool einzubinden und sich darin einzulernen, was oft zu Verkomplizierungen führt, daher besser, diese kleinen Dinge direkt selbst zu implementieren (Bsp.: Generierung eines zufälligen Wertes)
+
+- Bei externen Tools von deren Support abhängig, bei selbst entwickeltem Code nicht, dort kann selbst gewartet und eingegriffen - und ggf. verbessert - werden
+
+- Eigene Implementierung bietet Spielraum zur Erweiterung und Änderung; Fremdsoftware nur sehr eingeschränkt. Es ist möglich, dass mit einer neuen Anforderung an die Testdaten das bisher verwendete externe Tool nicht mehr auf den benötigten Fall anwendbar ist und so oder so selbst die Funktionalität implementiert werden muss.
+
+- Teilweise teure Lizenzen, Lizenzvereinbarungen müssen eingehalten werden, auch bei kostenloser \ac{OSS} teils Kosten für Support \cite{singh:2015}\cite{veracode:2021}
+
+- \ac{OSS} Risiken (oben erwähnt)
+
+- Potentielle Risiken von Drittanbietertools: Sicherheitslücken. Gerade Java-Programme nutzen eine sehr große Anzahl von Drittanbieter-Bibliotheken, sodass es kompliziert ist, einen Überblick über all die eingebundenen Bibliotheken und Frameworks zu behalten. Gerade dies ist aber extrem wichtig, da Sicherheitslücken nur durch Updates schnell behoben werden können, sofern Updates überhaupt bereitgestellt werden. \cite{veracode:2021} Beispiel: Seit Dezember 2021 gibt es eine Sicherheitslücke in Log4J, welche auch FNT betraf und sofort behoben werden musste. \cite{mit:2021} Nur für ein einzelnes Projekt ein Drittanbietertool einzubinden, welches für FNT noch nicht bewährt ist, kann also durchaus ein Risiko darstellen.
 
 \section{Erarbeitung eines Lösungskonzepts}\label{sec:loesungskonzept}
+
+\subsection{Methodiken zur Testdatengenerierung}\label{subsec:methodiken}
+In der Theorie und Praxis gibt es viele verschiedene Methoden zur Generierung von Testdaten. Im Folgenden sollen einige davon vorgestellt und in Hinblick auf Realisierbarkeit im Rahmen dieser Arbeit evaluiert werden.
+
+Deltafälle haben spezielle Voraussetzungen, um erkannt zu werden. Diese Voraussetzungen muss die Datengenerierung anhand des Namens des Deltafalls erkennen können. Hierbei sind verschiedene Vorgehensweisen denkbar. 
+
+Machine Learning: Algorithmus analysiert Daten und lernt so, wie sich die Daten bei spezifischen Deltafällen unterscheiden
+
+Händisches Definieren der Voraussetzungen: Aus diesen vom Programmierer geschriebenen Voraussetzungen, welche entweder in einer externen Datei erfasst oder intern nur als Konstanten gespeichert werden, kann der Algorithmus die Daten mit den benötigten Anpassungen generieren
+
+Diese Herangehensweise ist für den Umfang des in dieser Arbeit vorgestellten Projektes am Sinnvollsten. Ganz gemäß Fewster:
+
+\begin{quote}
+    \textit{\enquote{If you do build your own, do not attempt to produce a tool on the same scale as the commercial tools. [\dots] Build the smallest and simplest tools that will give you immediate and real benefit.} \cite{fewster:1999}}
+\end{quote}
+
+Kommerzielle Tools zur Datengenerierung sind sehr komplex und über Jahre von einem Team von Entwicklern entworfen und verbessert worden. Dabei benötigen Herangehensweisen wie genetische Algorithmen oder eine umfassende Expertise 
+
+für den Umfang des Projekts die Herangehensweise mit Machine Learning zu aufwändig erscheint (Algorithmus muss entworfen und mit vielen Daten trainiert werden), wurde sich zunächst für die händische Methode entschieden, da der primäre Fokus des Projekts darauf liegt, die Datengenerierung zumindest für den Anfang möglichst simpel zu implementieren, sodass in der begrenzten Zeit, die für das Projekt zur Verfügung steht, möglichst viel Ergebnisse erzielt werden. An diesem Punkt wurde das Einlernen in die Prinzipien des Machine Learning und das Umsetzen eines entsprechenden Algorithmus als zu komplex evaluiert. Gerade auch weil Testdaten bestimmte Bedingungen zu 100\% erfüllen müssen, um so Tests nicht aufgrund falsch konfigurierter Testdaten fehlschlagen zu lassen, wurde das Risiko, dass durch einen auf Machine Learning basierenden Algorithmus, der aufgrund fehlender Erfahrung im Bereich Machine Learning nicht optimal implementiert wurde, zu diesem Zeitpunkt als zu hoch eingeschätzt. Ebenfalls handelt es sich bei den Voraussetzungen für die Deltafälle um jederzeit bekannte Parameter, die wenig komplex sind. Nur hierfür einen Machine Learning Algorithmus zu implementieren, wäre für die Größe des Problems nicht angemessen und händisch effizienter zu lösen.
+
+

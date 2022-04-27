@@ -1,12 +1,5 @@
 \chapter{Realisierung}\label{ch:realisierung}
 
-Deltafälle haben spezielle Voraussetzungen, um erkannt zu werden. Diese Voraussetzungen muss die Datengenerierung anhand des Namens des Deltafalls erkennen können. Hierbei sind verschiedene Vorgehensweisen denkbar. 
-
-Machine Learning: Algorithmus analysiert Daten und lernt so, wie sich die Daten bei spezifischen Deltafällen unterscheiden
-
-Händisches Definieren der Voraussetzungen: Aus diesen vom Programmierer geschriebenen Voraussetzungen, welche entweder in einer externen Datei erfasst oder intern nur als Konstanten gespeichert werden, kann der Algorithmus die Daten mit den benötigten Anpassungen generieren
-
-Da für den Umfang des Projekts die Herangehensweise mit Machine Learning zu aufwändig erscheint (Algorithmus muss entworfen und mit vielen Daten trainiert werden), wurde sich zunächst für die händische Methode entschieden, da der primäre Fokus des Projekts darauf liegt, die Datengenerierung zumindest für den Anfang möglichst simpel zu implementieren, sodass in der begrenzten Zeit, die für das Projekt zur Verfügung steht, möglichst viel Ergebnisse erzielt werden. An diesem Punkt wurde das Einlernen in die Prinzipien des Machine Learning und das Umsetzen eines entsprechenden Algorithmus als zu komplex evaluiert. Gerade auch weil Testdaten bestimmte Bedingungen zu 100\% erfüllen müssen, um so Tests nicht aufgrund falsch konfigurierter Testdaten fehlschlagen zu lassen, wurde das Risiko, dass durch einen auf Machine Learning basierenden Algorithmus, der aufgrund fehlender Erfahrung im Bereich Machine Learning nicht optimal implementiert wurde, zu diesem Zeitpunkt als zu hoch eingeschätzt. Ebenfalls handelt es sich bei den Voraussetzungen für die Deltafälle um jederzeit bekannte Parameter, die wenig komplex sind. Nur hierfür einen Machine Learning Algorithmus zu implementieren, wäre für die Größe des Problems nicht angemessen und händisch effizienter zu lösen.
-
-
 Bisherige Struktur mit POJO-Klassen für alle Entitäten wurde als unpraktisch und kompliziert evaluiert und so wurde sich entschieden, für die generische Implementierung der Testdatengenerierung diese Struktur zu verwerfen und stattdessen eine zentrale Klasse zu entwerfen, welche alle möglichen Entitäten erfassen kann. Dies ist möglich, da für die Erstellung von Objekten über die BGEs die entsprechenden Objekte lediglich als JSON-String im Body der REST-Anfrage gesendet werden müssen - speziell auf eine Entität angepasste Klassen sind also gar nicht vonnöten.
+
+\section{Realisierung für Equipment-Entitäten am Beispiel der Chassis}

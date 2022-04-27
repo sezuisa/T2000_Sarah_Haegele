@@ -1,0 +1,63 @@
+			    {
+      "cSourceId": "TEST_CHASSIS_DELETE",
+      "selectedSourceSystem": "CIF_AUTOMATED_TEST",
+      "cSourceType": "OSN2500",
+      "id": "TEST_CHASSIS_DELETE",
+      "sourceSystem": "CIF_AUTOMATED_TEST",
+      "visibleId": "TEST_CHASSIS_DELETE",
+      "ipAddress": "10.122.77.02",
+      "hwRevision": "HW Version6",
+      "swRevision": "SW Version6",
+      "remark": "C19640287: Test nms chassis DELETE",
+      "serialNo": "123456562",
+      "createLinkDeviceMaster": {
+        "linkedElid": "EKJAG5VN1YBKEH"
+      },
+      "createLinkZone": {
+        "linkedElid": "7RJHP3VXHV4VJO"
+      }
+    },
+    {
+      "cSourceId": "TEST_CHASSIS_UPDATE",
+      "selectedSourceSystem": "CIF_AUTOMATED_TEST",
+      "cSourceType": "OSN2500",
+      "id": "TEST_CHASSIS_UPDATE",
+      "sourceSystem": "CIF_AUTOMATED_TEST",
+      "visibleId": "TEST_CHASSIS_UPDATE",
+      "ipAddress": "10.122.77.02",
+      "hwRevision": "HW Version6",
+      "swRevision": "SW Version6",
+      "remark": "C19640286: Test nms chassis UPDATE",
+      "serialNo": "123456561",
+      "createLinkDeviceMaster": {
+        "linkedElid": "EKJAG5VN1YBKEH"
+      },
+      "createLinkZone": {
+        "linkedElid": "7RJHP3VXHV4VJO"
+      }
+    },
+
+
+    {
+      "cabinetId": null,
+      "cabinetPosition": null,
+      "commandType": "3HE09196AA",
+      "commandZoneId": "CIF_PRE_AUTO_TEST_CAMPUS|CIF_AUTO_TEST_BUILDING|CIF_AUTO_TEST_FLOOR|CIF_AUTO_TEST_ROOM",
+      "createDate": null,
+      "groupingId": "TEST_CHASSIS_UPDATE",
+      "hardwareVersion": "HW Version6",
+      "ip": "10.122.77.05",
+      "isMasterDevice": "N",
+      "modifyDate": null,
+      "neId": null,
+      "nmsCabinetPosition": null,
+      "nmsId": "TEST_CHASSIS_UPDATE",
+      "nmsInternalId": "TEST_CHASSIS_UPDATE",
+      "nmsSourceSystem": "CIF_AUTOMATED_TEST",
+      "nmsType": "OSN2500",
+      "nmsZoneId": null,
+      "remark": "C19640286: Test nms chassis UPDATE",
+      "serialNumber": "123456561",
+      "softwareVersion": "SW Version6",
+      "warehouse": "WH1"
+    },

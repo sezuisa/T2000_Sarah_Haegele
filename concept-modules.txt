@@ -1,0 +1,36 @@
+===MODULE===
+
+Grundsätzlich:
+- Module werden in einen Slot eines Chassis oder in ein anderes Modul (dann handelt es sich um ein Submodul) platziert.
+- Chassis-Slots sind nur mit bestimmten Modulen kompatibel. Eine Auflistung der Slot-Kompatibilitäten findet sich in der Datenbanktabelle STCSPC_CHASSIS_SLOT
+
+-> select chassis_type_elid, slot from STCSPC_CHASSIS_SLOT where card_type_elid = 'ELID'
+Dieser SQL-Befehl liefert die Elids aller kompatiblen Chassis sowie sämtliche Slotnummern, die für das Modul theoretisch zur Verfügung stehen
+
+Vorgehen:
+- Modul-NMS-Basisrecord generieren
+- Hierbei wird ein Device Master für die Module ausgewählt (commandType)
+- Dann wird ein kompatibles Chassis gesucht. (s. DB-Query oben):
+    - Chassis muss mind. 1 kompatiblen Slot haben und in diesen Slot muss mind. 1 weiterer Modultyp passen (damit Typupdates möglich sind)
+    - Die Anzahl der zur Verfügung stehenden Slots wird gespeichert (wie viele Modue können in einem Chassis untergebracht werden? Möglichst früh erkennen, ob und wie viele zusätzliche Chassis noch benötigt werden)
+    - Suche wird in separater Methode durchgeführt, damit diese eventuell an späteren Stellen erneut aufgerufen werden kann (z.B. wenn die Module platziert werden und ein Chassis voll ist)
+    - Falls kein kompatibles Chassis gefunden wird, kann einem Chassis über den REST-Endpunkt "/axis/api/rest/entity/deviceMaster/{chassisElid}/addModuleSlotCompatibility" die Kompatibilität für das Modul hinzugefügt werden - dies sollte aber nach den Tests rückgängig gemacht werden, da hier Masterdaten verändert werden, die eventuell auf einer zu testenden Instanz regelmäßig verwendet werden!
+- Von den in das Chassis passenden Modultypen wird ein weiterer (nicht derselbe wie zu Anfang) ausgewählt, um für die Update Type Deltafälle verwendet zu werden
+- Die benötigten Chassis werden mit dem vorher bestimmten Device Master generiert
+- Die Chassis werden direkt in Command erstellt
+- Die visibleIds, Types und Elids dieser Chassis werden in einer Liste gespeichert
+
+- Jetzt kann erst ein Command-Basisrecord für die Module erstellt werden, da hierbei probeweise ein Checkrecord in eins der vorher erstellten Chassis platziert wird, um herauszufinden, welche Attribute dem Basisrecord noch fehlen
+- Die einzelnen Daten für die Module werden dann ähnlich wie bei den Chassis generiert
+- Dann werden die Module in die Chassis platziert. Der Slot wird dabei hochgezählt. Wenn das Platzieren in den Slot nicht möglich ist, wird der nächste Slot versucht. Wenn der letzte Slot erreicht ist und das Module nicht platziert werden konnte, muss evtl. doch noch ein zusätzliches Chassis erstellt werden.
+- Achtung: Evtl. müssen zusammengehörige Records in dasselbe Chassis (command, nms, planningCreate, planningDelete alle mit Bezug zum selben Chassis) bzw. sich sogar auf denselben Slot beziehen
+
+Konzept zur Modularität der Testdatengenerierung
+- Gerüst außen bleibt gleich für (fast) alle Entitäten: 
+    - Schleife über Entitäten, darin Schleife über Deltafälle
+    - Generierung von zwei Basisrecords
+    - Anhand der Deltafalldefinierung weitere Records generieren
+    - Generierte Records in Listen sortieren und Liste für Liste über die BGE erstellen
+- Konkrete Implementierung der Generierungen individuell für die Entitäten
+    - generateValue()-Methode (evtl. eigene Klasse für ValueGeneration, welche versch. Implementierungen hat?)
+    - 

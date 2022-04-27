@@ -1,0 +1,15 @@
+Delta Case;NMS Record;Command Record;Planned Create Record; Planned Delete Record
+CREATE;nms;;;
+UPDATE;nms;command;;
+DELETE;;command;;
+UPDATE_TYPE;nms;command;;
+PLANNED_CREATE;nms;;planningCreate;
+PLANNED_CREATE_NOP;;;planningCreate;
+PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE;nms;;planningCreate;
+PLANNED_DELETE;;command;;planningDelete
+PLANNED_DELETE_NOP;nms;command;;planningDelete
+PLANNED_DELETE_WITH_CREATE;nms;command;;planningDelete
+PLANNED_DELETE_WITH_PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE;nms;command;planningCreate;planningDelete
+PLANNED_DELETE_WITH_PLANNED_CREATE;nms;command;planningCreate;planningDelete
+PLANNED_DELETE_WITH_PLANNED_CREATE_NOP;nms;command;planningCreate;planningDelete
+PLANNED_DELETE_WITH_PLANNED_CREATE_NOP_DELETION;;command;planningCreate;planningDelete

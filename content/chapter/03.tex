@@ -1,7 +1,7 @@
 %!TEX root = ../../main.tex
 
 \chapter{Ist-Analyse}\label{ch:istanalyse}
-
+In diesem Kapitel wird der Status quo bezüglich des automatisierten Testens bei FNT analysiert und dargestellt. Es wird dabei ein besonderer Fokus auf das Projekt \enquote{CIF Automated Tests} gelegt, da das in Kapitel \ref{ch:sollzustand} dieser Arbeit erarbeitete Konzept zur automatischen Testdatengenerierung auf diesem Projekt basiert.
 
 \section{Automatisiertes Testen bei FNT}\label{sec:autotestsfnt}
 Genereller Aufbau von automatischen Testprojekten - alle folgen einer ähnlichen Struktur. Einbindung Jenkins, Testsuites über Gradle-Tasks - FNT Test Policy, Test Strategy
@@ -35,7 +35,15 @@ Das Testprojekt selbst richtet sich nach den in Kapitel \ref{sec:autotestsfnt} b
 
 - Tasks werden in einer Datei namens build.gradle definiert und in einer auf Groovy basierenden Skriptsprache geschrieben. Diese Datei und damit die Testtasks werden beim Erstellen eines Builds ausgeführt. Schlägt ein Test fehl, hat das ein Fehlschlagen des gesamten Builds zufolge.
 
-Die Tests werden in Java implementiert und über die Java-Testplattform \textit{JUnit} ausgeführt. JUnit erlaubt das Verwenden von Annotationen an den einzelnen Tests, beispielsweise um diese einfach in Testsuites zu gruppieren. Gerade diese Annotation kann in den Gradle Tasks genutzt werden, um alle vorhandenen Tests zu filtern und nur die Tests einer bestimmten Testsuite auszuführen. \cite{junit:2021}
+\begin{lstlisting}[caption=Ein Beispiel eines Gradle Tasks zum Ausführen einer Testsuite, label=Gradle-Task-Code, language=Groovy]
+    // Gradle-task example
+\end{lstlisting}
+
+Die Tests werden in Java implementiert und über die Java-Testplattform \textit{JUnit} ausgeführt. JUnit erlaubt das Verwenden von Annotationen an den einzelnen Tests, beispielsweise um diese einfach in Testsuites zu gruppieren. Gerade diese Annotation kann in den Gradle Tasks genutzt werden, um wie in Listing \ref{Gradle-Task-Code} alle vorhandenen Tests zu filtern und nur die Tests einer bestimmten Testsuite auszuführen. \cite{junit:2021}
+
+\begin{lstlisting}[caption=Ein Test in JUnit mit Annotationen, label=JUnit-Test,language=Java]
+    // JUnit Test mit Annotation
+\end{lstlisting}
 
 \section{Implementierung von Testfällen}\label{sec:testimplementierung}
 Als Einarbeitung in das Testprojekt Implementierung einiger Testfälle. Dabei wurden Testdaten manuell erstellt, was die meiste Zeit in Anspruch nahm und zu sehr vielen Fehlern führte, die korrigiert werden mussten

@@ -1,0 +1,20 @@
+===VERBESSERUNGEN & OPTIMIERUNGEN===
+
+- Zone wird nur einmal zu Beginn der ganzen Datengenerierung abgefragt und dann gespeichert, sodass hierfür keine unnötigen BGE-Anfragen gemacht werden
+
+- Irgendwie eine einfache Erweiterung der Datengenerierung ermöglichen
+    - Bei generateValue() sollte optimalerweise auch bei Feldern, die vom Namen her unbekannt sind, ein Wert generiert werden. Hierbei dürfte evtl. ein zufälliger String genügen, aber wenn der Wert etwas wie "elid", "zone", "link" oder so beinhaltet, müsste wohl genauer analysiert werden, damit der Wert valide ist. Man könnte vielleicht versuchen, ein Objekt der betrachteten Entität zu querien und sich dessen Wert(e) anzuschauen und anhand dessen einen ähnlichen Wert generieren? Wenn kein Objekt gequeried werden kann und kein valider Wert entsteht, Fehlermeldung ausgeben, dass die Datenenerierung erweitert werden muss?
+    - Eine Funktionalität implementieren, anhand derer man ein Attribut mit Wertedefinition eingeben kann und dann die generateValue()-Methode automatisch erweitert wird, um dieses Attribut zu unterstützen?
+
+
+=DESIGN-PATTERN=
+- Übersicht. https://www.javatpoint.com/design-patterns-in-java#:~:text=Java%20Design%20Patterns,3)
+- Zone vielleicht als Singleton...?
+
+Factory-Method-Pattern:
+-Eine Factory-Klasse, z.B. GetValueFactory oder GetRecordFactory, welche eine bestimmte Subklasseninstanz einer abstrakten Klasse, z.B. ValueGenerator oder RecordGenerator, zurückliefert. Hierfür wird eine Methode der abstrakten Klasse aufgerufen (getValueGenerator(), getRecordGenerator()), welche anhand eines übergebenen Parameters (z.B. Entitätsname) entscheidet, welcher Konstruktor welcher Subklasse (z.B. EquipmentValueGenerator, SubequipmentValueGenerator etc.) aufgerufen wird, um das korrekte Objekt zu erstellen.
+  - Konkret: DataGenerator-Klasse könnte abstrakte Elternklasse sein. Methode generateTestData() für alle Subklassen
+    - Subklassen: HardwareDataGenerator/EquipmentDataGenerator, SubequipmentDataGenerator, später evtl. DynamicEntityDataGenerator, TelcoDataGenerator
+    - In der DataGeneratorSteps-Klasse wird dann für die jeweilige Instanz über die Factory ein spezifisches DataGenerator-Objekt erstellt und dessen generateTestData()-Methode aufgerufen
+    - Methode zum Erstellen der Daten in Command wird auch von den einzelnen Subklassen übernommen
+
