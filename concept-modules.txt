@@ -7,6 +7,12 @@ Grundsätzlich:
 -> select chassis_type_elid, slot from STCSPC_CHASSIS_SLOT where card_type_elid = 'ELID'
 Dieser SQL-Befehl liefert die Elids aller kompatiblen Chassis sowie sämtliche Slotnummern, die für das Modul theoretisch zur Verfügung stehen
 
+Ergebnis der Chassis-Suche in Map:
+
+{"CHASSIS_ELID": ["slot1", "slot2", "slot3", ...],
+"CHASSIS_ELID2": ["slot8", "slot13"]
+...}
+
 Vorgehen:
 - Modul-NMS-Basisrecord generieren
 - Hierbei wird ein Device Master für die Module ausgewählt (commandType)
@@ -34,3 +40,30 @@ Konzept zur Modularität der Testdatengenerierung
 - Konkrete Implementierung der Generierungen individuell für die Entitäten
     - generateValue()-Methode (evtl. eigene Klasse für ValueGeneration, welche versch. Implementierungen hat?)
     - 
+
+
+
+== Attribute:
+
+= NMS:
+Mit Synchronize = Y:
+NMS_ID (visibleId)
+NMS_INTERNAL_ID (sourceId)
+SERIAL_NUMBER (serialNo) -> Achtung! In der AttributeConfiguration steht hier Serial Number und nicht Serial No!
+SOURCE_SYSTEM (cSourceSystem/selectedSourceSystem)
+
+Zusätzlich erforderlich:
+GROUPING_ID
+COMMAND_TYPE
+UNIQUE_POSITION
+
+createLinkToSlot benötigt den Elid des erstellten Chassis und eine Slotnummern
+
+z.B.:
+ "createLinkToSlot": {
+    "deviceAllElid": "S9GGCJVFEQACKF",
+    "slotNo": 1
+  }
+
+  TO DO:
+  - Implementation für Attribut/Operation "createLinkToSlot"
