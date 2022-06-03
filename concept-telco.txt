@@ -1,0 +1,186 @@
+==TELCO==
+
+Was brauchen Bearer (Preconditions)?
+- 2 Devices zum Verbinden, welche logische Ports besitzen (muss den Devices hinzugefügt werden) (ODER: 1 Device mit 2 log. Ports, die verbunden werden)
+- PTOLP Type 1 zum direkten Verbinden zweier Ports
+- Den Ports muss über ein Modify ein physischer Port zugewiesen werden (bei Fiber zwei)
+- Passenden Service Type zum Bearer suchen (createLinkServiceTypeDefinition)
+- Bearer braucht Startport und Endport (createLinkLogicalPortStart, createLinkLogicalPortEnd)
+    - Logical Ports können über den REST-Client gequeried werden; suche mit der objectId (nicht visibleId!) des Devices, das die Ports hat
+
+
+Was brauchen Services?
+- Bearer, welcher Ressourcen für den Service anbietet
+
+
+
+DB-Tabelle für Service & Bearer Masterdaten:
+STCTCO_SERVICE_MASTER
+
+Query für Bearer mit Packet Data Technologie:
+select * from STCTCO_SERVICE_MASTER where service_category = 'BEARER' and transmission_technology = 'PACKET_DATA'
+
+Masterdaten für Logical Ports: STCSPC_LOGICAL_PORT
+
+select port_type, signal_rate, ptolp, bandwidth from STCSPC_LOGICAL_PORT where ptolp = '2' or ptolp = '3' order by port_type
+
+{
+  "id": "TEST_BEARER_1234",
+  "sourceSystem": "CIF_AUTOMATED_TEST",
+  "visibleId": "TEST_BEARER_REST_3_4",
+  "createLinkLogicalPortEnd": {
+    "linkedElid": "TWDWX51SYNPMSQ"
+  },
+  "createLinkLogicalPortStart": {
+    "linkedElid": "6781OD3UAJ3MC1"
+  },
+  "createLinkServiceTypeDefinition": {
+    "linkedElid": "QY77E1UM4C14NL"
+  }
+}
+
+{
+  "id": "TEST_BEARER_1234",
+  "sourceSystem": "CIF_AUTOMATED_TEST",
+  "visibleId": "TEST_BEARER_DELTACASE",
+  "sourceID": "TEST_BEARER_DELTACASE",
+  "unibi": "U",
+  "remark": "Test Bearer for delta case DELTACASE",
+  "createLinkLogicalPortEnd": {
+    "linkedElid": "ELID"
+  },
+  "createLinkLogicalPortStart": {
+    "linkedElid": "ELID"
+  },
+  "createLinkServiceTypeDefinition": {
+    "linkedElid": "ELID"
+  }
+}
+
+NMS Bearer:
+{
+  "commandServiceType": "Eth-1GB_B",
+  "logicalPortNmsIdA": "TEST_CHASSIS_TELCO_3-PORT_1",
+  "logicalPortNmsIdB": "TEST_CHASSIS_TELCO_4-PORT_1",
+  "nmsId": "TEST_BEARER_REST_3_4",
+  "nmsSourceSystem": "CIF_AUTOMATED_TEST",
+  "visibleId": "TEST_BEARER_REST_3_4"
+}
+
+
+{
+  "id": "TEST_NE_1234",
+  "sourceSystem": "CIF_AUTOMATED_TEST",
+  "name": "TEST_NE_DELTACASE",
+  "sourceId": "TEST_NE_DELTACASE",
+  "type": "Antenna",
+  "remark": "Test Network Element for delt case CASE",
+  "addMasterZone": {
+    "linkedElid": "ELID"
+  }
+}
+
+
+Benötigte Deltafälle/Use Cases: Create, Update, Delete
+- NE (DB-Settings!)
+- Log. Port Typ 2 & 3 (Auch mit Link)
+- Bearer, Path, Unrouted Path, Unrouted Multipoint
+
+
+
+{
+  "bandwidth": 100000,
+  "overloadWarning": "NO_PORT_MONITORING",
+  "portNameOrg": "1",
+  "portType": "100 Gbit/s",
+  "sourceSystem": "CIF_AUTOMATED_TEST",
+  "sourceId": "TEST_LOGICAL_PORT_DELTACASE",
+  "signalRate": null,
+  "createLinkDeviceAll": {
+    "linkedElid": "ELID"
+  }
+}
+
+{
+  "bandwidth": 100000,
+  "overloadWarning": "NO_PORT_MONITORING",
+  "portNameOrg": "1",
+  "portType": "100 Gbit/s",
+  "sourceSystem": "CIF_AUTOMATED_TEST",
+  "sourceId": "TEST_LOGICAL_PORT_DELTACASE",
+  "signalRate": null,
+  "createLinkDeviceAll": {
+    "linkedElid": "ELID"
+  }
+}
+
+{
+  "bandwidth": 100000,
+  "commandPtype": "3",
+  "commandType": "100 Gbit/s",
+  "logicalPortNmsName": "1",
+  "neNmsId": "TEST_NE_MTP_5",
+  "nmsId": "TEST_NE_MTP_5-1",
+  "nmsInternalId": "TEST_PORT_MULTIPOINT_1",
+  "nmsSourceSystem": "CIF_AUTOMATED_TEST",
+  "overloadWarning": "NO_PORT_MONITORING"
+}
+
+
+{
+  "id": "TEST_PATH_1234",
+  "sourceSystem": "CIF_AUTOMATED_TEST",
+  "unibi": "B",
+  "visibleId": "TEST_PATH_DELTACASE",
+  "sourceId": "TEST_PATH_DELTACASE",
+  "addRoute": [
+    {
+      "direction": "AB",
+      "linkedElid": "Z65XSP5J8AFZX7", 
+      "sequenceNo": 1
+    }
+  ],
+  "createLinkServiceTypeDefinition": {
+    "linkedElid": "QSIOM3PSUPJ0AV"
+  }
+}
+
+Route:
+- Elid des Bearers, über den man den Path legen möchte
+- sequenceNo 1 für ersten Bearer in der Route
+
+
+{
+  "commandCategory": "Multipoint",
+  "commandType": "MtP_1GB",
+  "nmsId": "TEST_NMS_UNROUTED_MULTIPOINT_1",
+  "nmsSourceSystem": "CIF_AUTOMATED_TEST",
+  "visibleId": "TEST_NMS_UNROUTED_MULTIPOINT_1"
+}
+
+nmsunroutedmultipointlogicalportlink:
+{
+  "logicalPortNmsId": "TEST_NE_MTP_5-1",
+  "nmsSourceSystem": "CIF_AUTOMATED_TEST",
+  "linkNmsId": "TEST_LINK_MULTIPOINT_LOGPORT",
+  "serviceNmsId": "TEST_NMS_UNROUTED_MULTIPOINT_1"
+}
+--> logicalPortNmsId ist die Id des Ports, welche sich folgendermaßen zusammensetzt:
+NE/DeviceNmsId-portName
+
+
+
+
+Generell: Wie kann die Tdg so wiederverwendet werden, dass z.B. ein NE oder ein Logical Port als Preconditions für Bearer und Services ohne weitere dedizierte create-Methoden erstellt werden können?
+
+Optimalerweise sollte eine Klasse TelcoDataGenerator ausreichen für alle Telco-Entitäten...
+
+- Preconditions für Entität müssen irgendwo bekannt sein.
+- Kann einfach für die Precondition-Objekte nochmal generateTestData(), aber eben mit der benötigten Entität aufgerufen werden?
+- In dem Fall müssten halt die benötigten Daten wie Elids etc. irgendwie gespeichert werden... 
+
+- In generateTestData() eine Methode zum Prüfen von Preconditions aufrufen
+- Diese ruft wiederum wieder generateTestData() auf, aber für eine andere Entität und immer den Deltafall CREATE
+- generateTestData() liefert die generierten Records zurück
+- Diese werden dann in einer äußeren Rekursionsebene erstellt und deren Elids etc. in der TelcoDataGenerator Klasse in einer Map gespeichert (Key ist Entität + attribName, Value is attribValue)
+

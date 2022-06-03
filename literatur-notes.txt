@@ -2,6 +2,16 @@
        LITERATUR - NOTES
 ================================
 
+Buch über Software Engineering:
+https://archive.org/details/encyclopediaofso0001unse_d2y1/page/n11/mode/2up
+
+https://link.springer.com/chapter/10.1007/978-3-030-28494-7_6
+
+Buch Software Test Automation:
+Ch. 6 (Pre- & Post-Processing) -> S. 
+
+
+
 Reviewing Automatic Test Data Generation
 - https://www.researchgate.net/profile/Dr-Mukesh-Kumar-2/publication/334263137_Reviewing_Automatic_Test_Data_Generation/links/5d1f95e692851cf44068e314/Reviewing-Automatic-Test-Data-Generation.pdf
 

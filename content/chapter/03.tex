@@ -45,10 +45,44 @@ Die Tests werden in Java implementiert und über die Java-Testplattform \textit{
     // JUnit Test mit Annotation
 \end{lstlisting}
 
+\section{Testdaten im Projekt \enquote{CIF Automated Tests}}\label{sec:testdatenIst}
+\ac{JSON}-Files, statisch, unflexibel, Typen fest codiert, unübersichtlich (sehr viele Dateien)
+Großer Nachteil: Schlechte Portabilität. Testdaten sind auf eine konkrete Testinstanz angepasst und können eventuell auf einer anderen nicht verwendbar sein (fehlende Typen) (QUELLE FÜR PORTABILITÄT)
+
+In den einzelnen \ac{JSON}-Dateien werden die Daten in Form eines Arrays gehalten, wobei ein Arrayeintrag ein Testobjekt darstellt. Für jede Entität existieren mehrere \ac{JSON}-Dateien, um die Anforderungen an die Deltafälle abzudecken - so benötigt ein Objekt mit Fall \enquote{CREATE} beispielsweise nur Testdaten in einer Datei, die \ac*{NMS}-Testobjekte für die Entität sammelt, der Fall \enquote{UPDATE} aber schon Daten in zwei verschiedenen Dateien, da sowohl ein Testobjekt zum Einfügen in die \ac*{NMS}-Tabelle als auch eines direkt in \textit{Command} vonnöten ist. Im Folgenden ist ein Objekt der Entität Chassis beispielhaft in \ac{JSON}-Form angegeben.
+
+\begin{lstlisting}[caption=Testdaten für ein Chassis in JSON-Form, label=JSON-Testdaten,language=json]
+[
+    {
+        "cSourceId": "TEST_CHASSIS_UPDATE",
+        "selectedSourceSystem": "CIF_AUTOMATED_TEST",
+        "cSourceType": "OSN2500",
+        "id": "TEST_CHASSIS_UPDATE",
+        "sourceSystem": "CIF_AUTOMATED_TEST",
+        "visibleId": "TEST_CHASSIS_UPDATE",
+        "ipAddress": "10.122.77.02",
+        "hwRevision": "HW Version6",
+        "swRevision": "SW Version6",
+        "remark": "C19640286: Test nms chassis UPDATE",
+        "serialNo": "123456561",
+        "createLinkDeviceMaster": {
+          "linkedElid": "EKJAG5VN1YBKEH"
+        },
+        "createLinkZone": {
+          "linkedElid": "7RJHP3VXHV4VJO"
+        }
+    }
+]
+\end{lstlisting}
+
+Diese \ac{JSON}-Dateien werden in der Testsuite \enquote{apiSetUpEnvironment} zunächst geparst und die einzelnen Arrayeinträge mithilfe der Java Bibliothek \enquote{Jackson} zu Objekten von sogenannten \ac{POJO}-Klassen deserialisiert. Daraufhin muss bei jedem Objekt einzeln der Wert für die \ac{Elid} der verlinkten Zone abgeändert werden. Dies hat den Grund, dass die Zone, in welcher während eines Testlaufs Testobjekte platziert werden, nach jedem Testlauf gelöscht und daher immer wieder neu erstellt werden muss. Hierbei verändert sich auch immer die \ac{Elid} der Zone, da \ac{Elid}s einzigartig sind und für jedes neu erstellte Objekt in \textit{Command} generiert werden. Dieser Wert kann also nur zur Zeit der Testausführung korrekt gesetzt werden.
+
+Sind für alle Objekte die Attribute mit korrekten Werten gefüllt, werden sie über Aufrufe von dafür vorgesehenen \ac{REST}-Endpunkten der \textit{Command} \ac{BGE} entweder in die \ac{NMS}-Tabellen gefüllt oder in \textit{Command} erstellt.
+
 \section{Implementierung von Testfällen}\label{sec:testimplementierung}
 Als Einarbeitung in das Testprojekt Implementierung einiger Testfälle. Dabei wurden Testdaten manuell erstellt, was die meiste Zeit in Anspruch nahm und zu sehr vielen Fehlern führte, die korrigiert werden mussten
 
-- Tests haben auf einer älteren Version von Command nicht funktioniert, da dort einer der fest in den JSONs niedergeschriebenen Hardwaretypen gar nicht vorhanden war. 
+- Tests haben auf einer älteren Version von Command nicht funktioniert, da dort einer der fest in den \ac{JSON} Dateien niedergeschriebenen Hardwaretypen gar nicht vorhanden war. Wie schon in Kapitel \ref{sec:testdatenIst} als Nachteil der bisherigen Herangehensweise an Testdaten angemerkt
 
 Buch "QA durch Softwaretests", S. 67: Vorteile von Testdaten in externen Dateien (aber es dreht sich um sehr kleine Systeme)
 S. 311: Manuelle Erstellung von Testdaten kann sehr aufwändig werden

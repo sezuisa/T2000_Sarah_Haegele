@@ -4,7 +4,7 @@
 Dieses Kapitel befasst sich mit einigen Grundlagen, die zum Verständnis dieser Arbeit vonnöten sind. Die zwei nachfolgenden Unterkapitel können von derjenigen Leserschaft, die bereits Erfahrungen mit \textit{Command} und vor allem dem \ac{CIF} hat, übersprungen werden.
 
 \section{FNT Command}\label{sec:command}
-\textit{FNT Command}, im Folgenden \textit{Command} genannt ist, wie bereits im Kapitel \ref{sec:fnt} erwähnt, eine Software zum Management von IT-, Rechenzentrums- und Telekommunikationsinfrastrukturen. In der Software können ganze Gebäude mit ihrer technischen Infrastruktur bis ins Detail virtuell abgebildet werden. \textit{Command} ermöglicht hierbei die Planung von physischen Gerätetypen, beispielsweise eines Chassis, in einzelnen Räumen eines Gebäudes bis hin zur Dokumentation von logischen Elementen wie Services.
+\textit{FNT Command}, im Folgenden \textit{Command} genannt, ist, wie bereits im Kapitel \ref{sec:fnt} erwähnt, eine Software zum Management von IT-, Rechenzentrums- und Telekommunikationsinfrastrukturen. In der Software können ganze Gebäude mit ihrer technischen Infrastruktur bis ins Detail virtuell abgebildet werden. \textit{Command} ermöglicht hierbei die Planung von physischen Gerätetypen, beispielsweise eines Chassis, in einzelnen Räumen eines Gebäudes bis hin zur Dokumentation von logischen Elementen wie Services.
 
 \textit{Command} ist eine browserbasierte Anwendung, welche sich in die folgenden drei Schichten gliedert:
 
@@ -17,9 +17,9 @@ ABBILDUNG
 \end{itemize}
 
 \section{Das Command Integration Framework}\label{sec:cif}
-Zwar wird von \textit{Command} nach außen hin als eine große Software gesprochen, jedoch besteht diese aus vielen einzelnen und optionalen Custom-Modulen, welche ein Standard-Basismodul um zahlreiche Funktionalitäten erweitern und vom Kunden nur auf Wunsch zu diesem hinzugefügt werden. So können sich mehrere Instanzen von \textit{Command} bei verschiedenen Kunden deutlich unterscheiden. Eines der erwähnten Custom-Module, welches allerdings in Zukunft in das Standardmodul integriert werden soll, ist das \ac{CIF}.
+Zwar wird von \textit{Command} nach außen hin als eine große Software gesprochen, jedoch besteht diese aus vielen einzelnen und optionalen Custom-Modulen, welche ein Standard-Basismodul um zahlreiche Funktionalitäten erweitern und vom Kunden nur auf Wunsch zu diesem hinzugefügt werden. So können sich mehrere Instanzen von \textit{Command} bei verschiedenen Kunden deutlich unterscheiden. Eines der erwähnten Custom-Module, welches allerdings seit \textit{Command 13.4} in das Standardmodul integriert ist, ist das \ac{CIF}.
 
-Unternehmen speichern in der Realität oft große Mengen an Daten dezentral in unterschiedlichen Softwareprodukten mehrerer Hersteller, was eine Übersicht über diese erschwert und somit ein erhöhtes Risiko für fehlerhaft dokumentierte Daten darstellt. Das \ac{CIF} bietet Nutzern von \textit{Command} die Möglichkeit, Daten aus Fremdsystemen in \textit{Command} zu integrieren und so zentral zu verwalten. Dessen Aufbau ist in der folgenden Abbildung ersichtlich.
+Unternehmen speichern in der Realität oft große Mengen an Daten dezentral in diversen Softwareprodukten unterschiedlicher Hersteller, was eine Übersicht über diese erschwert und somit ein erhöhtes Risiko für fehlerhaft dokumentierte Daten darstellt. Das \ac{CIF} bietet Nutzern von \textit{Command} die Möglichkeit, Daten aus Fremdsystemen in \textit{Command} zu integrieren und so zentral zu verwalten. Dessen Aufbau ist in der folgenden Abbildung ersichtlich.
 
 ABBILDUNG CIF
 
@@ -59,7 +59,7 @@ Unter diesen Gesichtspunkten wird deutlich, dass Testsuites für jedes \ac{SUT} 
 In Anbetracht der Vielfalt von Software und deren Architektur ist es nicht möglich, mit einer einzigen festen Herangehensweise an das Testen von Software jedwedes zu testende Stück Code abzudecken. Daher sind für diverse Situationen unterschiedliche Testkonzepte und -methoden entstanden. Für einige davon soll im Folgenden eine Übersicht gegeben werden.
 
 \subsubsection*{Whitebox Tests}\label{subsubsec:whitebox}
-Werden auch als strukturelle Tests bezeichnet, da hierbei die interne Struktur des \ac{SUT} als Testbasis dient. Dies bedeutet, dass das System beim Testen völlig transparent und der Programmcode für die zu testende Programmfunktionalität einsehbar ist und so bestimmte Codezweige gezielt getestet werden können. Whitebox Tests sind hierbei als Überbegriff für sämtliche Testverfahren anzusehen, welche ihre Tests direkt auf dem Code basieren. Dazu zählen beispielsweise Unit Tests, welche im weiteren Verlauf separat erläutert werden sollen.
+Werden auch als strukturelle Tests bezeichnet, da hierbei die interne Struktur des \ac{SUT} als Testbasis dient. Dies bedeutet, dass das System beim Testen völlig transparent und der Programmcode für die zu testende Programmfunktionalität einsehbar ist und so bestimmte Codezweige gezielt getestet werden können. \cite[S. 125f.]{oregan:2019} Whitebox Tests sind hierbei als Überbegriff für sämtliche Testverfahren anzusehen, welche ihre Tests direkt auf dem Code basieren. Dazu zählen beispielsweise Unit Tests, welche im weiteren Verlauf separat erläutert werden sollen. 
 
 Whitebox Testing erlaubt es, ein System sehr gründlich und tiefgreifend zu testen, da spezielle Verzweigungen angezielt werden können. Es können somit vielerlei Fehler sehr früh entdeckt werden. Weiterhin ist diese Methode für die Optimierung von Code durchaus förderlich, da Bottlenecks (EXPLANATION) frühzeitig erkannt werden können. Whitebox Tests sind ferner relativ einfach zu automatisieren (EXPLANATION + CITATION) und ermöglichen eine Rückverfolgung der Tests vom Code aus, um dortige Änderungen einfach in neuen Tests zu erfassen (CITATION, EXPLANATION?).
 
@@ -68,7 +68,7 @@ Die starke Fixierung auf die Struktur eines \ac*{SUT} bringt allerdings auch Nac
 VIELLEICHT ALS BULLET POINTS?
 
 \subsubsection*{Blackbox Tests}\label{subsubsec:blackbox}
-Text
+Ähnlich wie das Whitebox Testing ist auch das Blackbox Testing lediglich ein Überbegriff für diverse Arten von Tests. Wie sich schon am Namen ableiten lässt, stellen Blackbox Tests dabei das Gegenteil zu den Whitebox Tests dar. Sie werden auch als spezifikationsorientierte Tests bezeichnet, da sie lediglich auf das Verifizieren der korrekten Funktionalität, also den geforderten Spezifikationen, eines Systems ausgerichtet sind. Das System selbst bleibt dabei eine sogenannte Blackbox, was bedeutet, dass die innere Struktur des \ac{SUT} unbekannt ist. \cite[S. 120f.]{oregan:2019}
 
 \subsubsection*{Greybox Tests}\label{subsubsec:greybox}
 Text

@@ -14,6 +14,8 @@ Um mit dem Projekt der automatischen Testdatengenerierung einen effektiven Mehrw
 
 - Direkte Einbindung in das bestehende Testprojekt - "läuft das Testprojekt, läuft auch die Datengenerierung"
 
+- Testdatengenerierung soll unabhängig von der darunterliegenden \textit{Command}-Instanz funktionieren
+
 - Keine erheblichen Performance-Einbußen (mit leichten Einbußen durch die benötigte Zeit zur Datengenerierung ist zu rechnen)
 
 - Es sollten nur so viele Testdaten und nur so detailreich wie nötig generiert werden, um Performance und Komplexität zu optimieren
@@ -102,6 +104,8 @@ Es wurde sich gegen die Verwendung eines Drittanbietertools entschieden. Gründe
 
 - Potentielle Risiken von Drittanbietertools: Sicherheitslücken. Gerade Java-Programme nutzen eine sehr große Anzahl von Drittanbieter-Bibliotheken, sodass es kompliziert ist, einen Überblick über all die eingebundenen Bibliotheken und Frameworks zu behalten. Gerade dies ist aber extrem wichtig, da Sicherheitslücken nur durch Updates schnell behoben werden können, sofern Updates überhaupt bereitgestellt werden. \cite{veracode:2021} Beispiel: Seit Dezember 2021 gibt es eine Sicherheitslücke in Log4J, welche auch FNT betraf und sofort behoben werden musste. \cite{mit:2021} Nur für ein einzelnes Projekt ein Drittanbietertool einzubinden, welches für FNT noch nicht bewährt ist, kann also durchaus ein Risiko darstellen.
 
+- Letztlich soll das Datengenerierungssprojekt aber auch gewissermaßen ein Proof of Concept darstellen - ist eine Datengenerierung für \textit{FNT} denn überhaupt - und wenn, dann auch nur mit bereits verfügbaren Ressourcen möglich?
+
 \section{Erarbeitung eines Lösungskonzepts}\label{sec:loesungskonzept}
 
 \subsection{Methodiken zur Testdatengenerierung}\label{subsec:methodiken}
@@ -122,5 +126,107 @@ Diese Herangehensweise ist für den Umfang des in dieser Arbeit vorgestellten Pr
 Kommerzielle Tools zur Datengenerierung sind sehr komplex und über Jahre von einem Team von Entwicklern entworfen und verbessert worden. Dabei benötigen Herangehensweisen wie genetische Algorithmen oder eine umfassende Expertise 
 
 für den Umfang des Projekts die Herangehensweise mit Machine Learning zu aufwändig erscheint (Algorithmus muss entworfen und mit vielen Daten trainiert werden), wurde sich zunächst für die händische Methode entschieden, da der primäre Fokus des Projekts darauf liegt, die Datengenerierung zumindest für den Anfang möglichst simpel zu implementieren, sodass in der begrenzten Zeit, die für das Projekt zur Verfügung steht, möglichst viel Ergebnisse erzielt werden. An diesem Punkt wurde das Einlernen in die Prinzipien des Machine Learning und das Umsetzen eines entsprechenden Algorithmus als zu komplex evaluiert. Gerade auch weil Testdaten bestimmte Bedingungen zu 100\% erfüllen müssen, um so Tests nicht aufgrund falsch konfigurierter Testdaten fehlschlagen zu lassen, wurde das Risiko, dass durch einen auf Machine Learning basierenden Algorithmus, der aufgrund fehlender Erfahrung im Bereich Machine Learning nicht optimal implementiert wurde, zu diesem Zeitpunkt als zu hoch eingeschätzt. Ebenfalls handelt es sich bei den Voraussetzungen für die Deltafälle um jederzeit bekannte Parameter, die wenig komplex sind. Nur hierfür einen Machine Learning Algorithmus zu implementieren, wäre für die Größe des Problems nicht angemessen und händisch effizienter zu lösen.
+
+Auch nach einer Absprache mit dem für das \ac*{CIF} verantwortlichen Entwicklerteam wurde eine eher händische Vorgehensweise als angemessen für den Rahmen des Projekts evaluiert.
+
+- Es sollte versucht werden, sich nur an bereits vorhandenen Tools und Ressourcen zu bedienen und keine größeren externen Frameworks oder Applikationen einbinden zu müssen. Auch hierfür bietet sich der händische Prozess an, da vom Entwickler selbst evaluiert werden kann, welche Tools wo eingesetzt werden können, er*sie mit diesen bereits vertraut ist und sich diese im Unternehmen bewährt haben und so mit einer höheren Sicherheit verwendet werden können. Es ist ein logischer Schluss, dass das Potential für Fehler sich erhöht, je mehr Frameworks und Tools für ein Projekt verwendet werden, da jedes dieser Tools eigene und einzigartige Fehler beinhalten kann.
+
+\subsection{Vorüberlegungen zur Konzeptionierung}\label{subsec:vorueberlegungen}
+Bevor ein genaueres Vorgehen konzeptioniert werden kann, gibt es in Anbetracht der in Kapitel \ref{sec:anforderungen} formulierten Anforderungen einige Vorüberlegungen zu treffen.
+
+Mit Hinblick auf die Performance-Anforderungen gibt es grundsätzlich zwei Möglichkeiten, den Zeitpunkt der Datengenerierung festzulegen:
+
+\begin{enumerate}
+    \item Die Testdaten werden parallel zur Ausführung von vorher stattfindenden Tests in einem eigenen Thread generiert, was potentiell viel Zeit sparen kann.
+    \item Die Testdaten werden erst zu dem Zeitpunkt generiert, zu dem sie tatsächlich benötigt werden, sodass in jedem Fall vor der Testausführung auf die Datengenerierung gewartet werden muss.
+\end{enumerate}
+
+Letzteres findet im Ist-Zustand des Projekts \enquote{CIF Automated Tests} bereits Verwendung. Nach genauerer Analyse stellt sich heraus, dass dies trotz längerer Wartezeiten auch beibehalten werden muss, denn wie schon in Kapitel \ref{sec:testdatenIst} erkannt, benötigen die Testdaten für jeden Testlauf eine aktuelle \ac{Elid} zu einer eigens für die Tests erstellten Zone. Da diese Zone aber erst in den Tests vor der Datengenerierung erstellt wird, können zu diesem oder einem früheren Zeitpunkt nicht bereits Daten generiert werden.
+
+Die obige Problematik führt unausweichlich zu der Fragestellung, in welchem Maße die Tests im Allgemeinen unabhängig gestaltet werden können, ohne mit größeren Performance-Einbußen rechnen zu müssen. Testfälle sollten generell so unabhängig wie möglich von anderen Tests sein, um einen \enquote{Dominoeffekt} zu vermeiden. Dies bedeutet, dass Tests fehlschlagen, weil andere Tests zuvor fehlgeschlagen sind. \cite[S. 197]{fewster:1999} Dieser Logik folgend erschließt sich, dass bei jedem Test theoretisch sämtliche Vorbedingungen und Testdaten individuell für den betrachteten Test neu erstellt werden müssten. Dies ist jedoch in der Realität für die automatisierten Tests des \ac{CIF} nicht tragbar, da hierdurch ein enormer Zeitmehraufwand mit jeden Testlauf verbunden wäre. 
+
+Die performanteste Variante bestünde zweifelsohne daraus, alle benötigten Testdaten im Voraus für sämtliche Tests nur einmal zu generieren und alle Testsuites dann nur noch hierarchisch nacheinander ausführen zu müssen. Beispielsweise könnte dann ein schon existierendes Testobjekt eines Chassis-Tests als Vorbedingung für einen später stattfindenden Test verwendet werden, um Ressourcen zu sparen. Hierbei besteht aber die Gefahr des oben beschriebenen \enquote{Dominoeffekts}, denn wenn die Datengenerierung einen Fehler enthält, könnten alle von generierte Daten abhängigen Tests fehlschlagen, insbesondere Test, welche auf dieselben Vorbedingungen, wie beispielsweise eine Zone, zurückgreifen. 
+
+Es wurde daher ein Kompromiss aus Unabhängigkeit der Tests und Performance getroffen. Dieser Kompromiss besteht daraus, die Tests in logische Gruppen, im Folgenden auch als Testsuites bezeichnet, zu unterteilen, genauer in Hardware-, Telco- oder Service- und in Zonenentitäten. Testdaten sollen für jede Testsuite neu generiert werden, sodass die Suites in beliebiger Reihenfolge unabhängig voneinander ausgeführt werden könnten. Innerhalb einer Testsuite wird der Datengenerierungsprozess jedoch nur einmal zu Beginn der Suite ausgeführt, sodass folglich alle enthaltenen Tests auf diese generierte Testdatenbasis zurückgreifen. Es soll also ein \enquote{Pre-Processing at Test-Suite} durchgeführt werden. (CITATION?)
+
+\subsection{Erstellen eines konkreten Konzepts}\label{subsec:konzept}
+TODO - Um ein konkretes Konzept für die Datengenerierung zu erstellen, wurde ein möglicher Ablauf Schritt für Schritt gedanklich durchgeführt und schriftlich festgehalten.
+
+Wie schon in Kapitel \ref{subsec:methodiken} diskutiert, wurde sich dafür entschieden, die Voraussetzungen für Deltafälle händisch zu definieren und davon ausgehend die Datengenerierung aufzubauen. Diese Spezifikationen müssen dauerhaft gespeichert und verfügbar sein. Hierfür war es einerseits denkbar, die Spezifikationen als Konstanten direkt im Code zu definieren. Dies bietet zwar einserseits den Vorteil, dass keinerlei extra Dateien vonnöten sind und dementsprechend auch nicht geparst werden müssen. Jedoch können bei der Verwendung von Konstanten Endbenutzer der Datengenerierung Änderungen an den Spezifikationen nicht so leicht durchführen, da hierfür direkt in den Code eingegriffen werden muss. Stattdessen können externe Konfigurationsdateien sehr einfach angepasst werden und separieren Spezifikationen vom Rest des Projekts, sodass ein einfacher Überblick geschaffen werden kann. Es wurde sich also dazu entschieden, die grundlegenden Voraussetzungen in Konfigurationsdateien zu formulieren. Für diese Dateien soll entweder das \ac{CSV} oder das \ac{XML}-Format verwendet werden, da diese Formate einfach zu parsen und zu erweitern sind und gleichzeitig eine sehr übersichtliche Ansicht erlauben.
+
+Die Entscheidung, die Datengenerierung auf externe Konfigurationsdateien aufzubauen, wurde auch vom schon in der Toolanalyse betrachteten Datengenerierungstool \textit{Benerator} beeinflusst. In diesem werden \ac{XML}-Dateien zur Konfiguration von Testdatensätzen verwendet. \cite{benerator:2022} Hierbei zeigt sich, dass eine tiefgreifende Toolanalyse in jedem Fall wertvolle Erkenntnisse mit sich bringt, auch, wenn sich gegen die Verwendung eines Drittanbietertools entschieden wird.
+
+Konkret sollen in einer Datei die Anforderungen der Deltafälle festgehalten werden, das heißt für jeden Deltafall muss dokumentiert sein, in welchen Tabellen Testobjekte vorhanden sein müssen, damit der korrekte Deltafall von \textit{Command} identifiziert wird. Eine weitere Datei soll dazu dienen, Entitäten Deltafällen zuzuordnen und somit zu konfigurieren, für welche Entitäten und für welche Deltafälle innerhalb dieser Entitäten Testdaten generiert werden müssen.
+
+auf der nachfolgenden Seite ist ein Programmablaufplan abgebildet, welcher den groben Ablauf der Datengenerierung verbildlicht. Anhand diesem wird das konzeptionell geplante Vorgehen näher beschrieben. Es ist zu erwähnen, dass in diesem Konzept noch keine finalen Festlegungen zu Datentypen, exakten Formen oder Formaten von Variablen, Dateien oder Methoden gemacht werden. Dies ist Thema der Realisierung in Kapitel \ref{ch:realisierung}. Außerdem bezieht sich dieses Konzept zunächst primär auf die Equipment-Entität \enquote{Chassis}, da eine erste Implementierung der Testdatengenerierung auch für genau diese Entität geschehen soll.
+
+\begin{figure}[htp]
+    \centering
+    \includegraphics[height=.9\textheight]{tdg_konzept_flowchart.drawio.png}
+    \caption{Konzeptioneller Programmablaufplan für die Datengenerierung\footnotemark}
+\end{figure}
+
+\newpage
+\begin{enumerate}
+    \item \textbf{Parsen der Dateien.} Der erste Schritt in einem Programmablauf, welcher eine von Konfigurationsdateien abhängige Ausführung beinhaltet, ist das Parsen ebendieser Dateien. Hierfür bietet Java verschiedene Möglichkeiten, welche im Kapitel \ref{ch:realisierung} weiter erläutert werden. Die Konfigurationen werden daraufhin in Java-Datenstrukturen, es bieten sich hierbei Listen oder Maps an, gespeichert, sodass über den restlichen Verlauf der Datengenerierung einfach auf die dort hinterlegten Werte zugegriffen werden kann.
+    \item \textbf{Äußere Schleife: Iterieren über die Entitäten.} Die einzelnen Entitäten sollen getrennt voneinander betrachtet werden. Dies hat den Grund, dass so Basisattribute und \ac{BGE}-\ac{REST}-Pfade innerhalb eines Schleifendurchgangs nur einmal definiert werden müssen und für alle benötigten Testdaten einer Entität wiederverwendet werden können. Außerdem bietet diese Herangehensweise eine gute Übersichtlichkeit und erleichtert auch wesentlich das Debugging des Programms, da leicht abgeschätzt werden kann, an welchem Punkt die Programmausführung steht und wo es zu Fehlern kommt. Für jede Entität wird zu Beginn der Entitätsname in einer Variablen gespeichert, sodass auf diesen leicht zugegriffen werden kann. Der Name muss dabei eventuell erst korrekt formatiert werden, um ihn auch zur Tätigung von \ac{BGE}-Aufrufe nutzen zu können.
+    \item \textbf{Abfragen der Entitätsattribute.} Das Abfragen der Attribute für eine Entität stellt einen Kernpunkt der Datengenerierung dar, da jede Entität individuelle Attribute hat, die sie definieren und die von \textit{Command} erkannt werden müssen. Es muss also genau bekannt sein, welche Attribute eine Entität benötigt, um ein valides Objekt davon in \textit{Command} erstellen zu können. Hierzu kommt die Schwierigkeit, dass sich Objekte der gleichen Entität in \ac{NMS}-Tabellen und \textit{Command}-Tabellen in ihren Attributen unterscheiden. Ein Beispiel hierfür ist das Typen-Attribut der Entität Chassis. Heißt es in einer \ac{NMS}-Umgebung einfach \enquote{commandType} und wird mit einem einfachen String, dem Namen des Chassistyps in \textit{Command}, befüllt, so nennt sich das korrespondierende Attribut für ein Objekt, welches in \textit{Command} zu erstellen ist, \enquote{createLinkDeviceMaster} und erfordert ein weiteres Unterattribut namens \enquote{linkedElid}, welches dann mit dem \ac{Elid}-String des Typen befüllt wird.
+    
+    Es ist möglich, die Attribute von \ac{NMS}-Entitäten über die \ac{BGE} abzufragen; hierfür existiert der folgende \ac{REST}-Endpunkt: 
+    \begin{center}
+        \colorbox{background}{\lstinline{/rest/entity/cifEntityConfiguration/\{entityElid\}/QueryCifAttributeConfiguration}}
+    \end{center}
+    
+    Als Pfadparameter wird die \ac{Elid} der gewünschten Entität übergeben. Diese kann über einen weiteren Endpunkt \colorbox{background}{\lstinline{cifEntityConfiguration/query}} erhalten werden, indem im \ac{JSON}-Body der Anfrage der Entitätsname als Beschränkung angegeben wird. Die Antwort auf die Anfrage der Attribute liefert für jedes definierte Attribut eine Attributkonfiguration in \ac{JSON}-Form zurück, die das Attribut näher beschreibt. So wird bsiepielsweise für jedes Attribut angegeben, ob es für die Deltaberechnung verwendet wird, ob es ein Pflichtattribut ist und auch der korrespondierende Name des Attributs in der \textit{Command}-Umgebung wird bei einigen Attributen dort dokumentiert. Dies kann später zur Akkumulation der \textit{Command}-relevanten Attribute verwendet werden. Im Folgenden ist beispielhaft eine Attributkonfiguration für das Attribut \enquote{nmsId} angegeben.
+
+    \begin{lstlisting}[caption=Attributkonfiguration für das Chassis-Attribut \enquote{nmsId}, label=nmsId-Konfiguration,language=json]
+        {
+            "commandAttribName": "VISIBLE_ID",
+            "msgId": 50009,
+            "attrName": "NMS_ID",
+            "locked": "Y",
+            "synchronizeToCommand": "Y",
+            "catalogName": "CIF",
+            "deltaCalculation": "N",
+            "required": "Y",
+            "dataLength": 200,
+            "dataType": "VARCHAR",
+            "remark": null
+        }
+    \end{lstlisting}
+
+    \item \textbf{Erstellen von Basisobjekten.} Um valide Testobjekte einer Entität zu erstellen, muss die Datengenerierung sich an bestätigt validen Referenzobjekten orientieren. Eine sehr einfache Möglichkeit, dies zu erreichen, ist das dauerhafte Platzieren jeweils eines Dummy-Objekts in der \ac{NMS}- und \textit{Command}-Tabelle. Die Existenz dieser Objekte in den Tabellen allein dient als Validierung der Attribute und für tatsächliche Testobjekt müssten nur noch Werte abgeändert werden. Jedoch widerspricht diese Vorgehensweise den in Kapitel \ref{sec:anforderungen} formulierten Anforderungen, wonach alle durch die Testausführung erstellten Objekte in \textit{Command} oder den \ac{NMS}-Tabellen nur für die Zeit des Testlaufs bestehen und danach wieder bereinigt werden sollen. Weiterhin müssten für jede neue Testinstanz und darauf für jede Entität zwei Dummy-Objekte manuell und statisch erstellt werden, was dem grundsätzlichen Prinzip der Testdatengenerierung entspricht, sich von den statisch niedergeschriebenen Testdaten loszusagen.
+    
+    Stattdessen sollen die Basis- oder Referenzobjekte in jedem Testlauf dynamisch neu zusammengesetzt und gar nicht erst in \textit{Command} erstellt werden. Für \ac{NMS}-Objekte ist dies über die im vorherigen Schritt abgefragten Attributkonfigurationen möglich. Es werden bis auf wenige Ausnahmen nur die Attribute benötigt, die in ihrer Konfiguration mit \colorbox{background}{\lstinline{\"synchronizeToCommand\": \"Y\"}} als relevant für die Vorgänge im \ac{CIF} gekennzeichnet sind. Durch das Abfragen der Attribute wird gewährleistet, dass das Basisobjekt aus tatsächlich existierenden Attributen zusammengesetzt wird und keine Fehler durch veraltete statische Daten oder gar Schreibfehler auftauchen können. Auch für \textit{Command}-Objekte soll ein Basisobjekt geschaffen werden. Dieses kann sich, wie schon im Punkt 3. erwähnt, teilweise auch aus den Attributkonfigurationen der \ac{NMS}-Attribute über den Wert im Feld \enquote{commandAttribName} zusammensetzen. Dies trifft aber nicht auf jedes benötigte Attribut zu. Die restlichen Command-Attribute müssen also auf anderem Wege abgefragt werden. Eine Möglichkeit hierfür ist der wiederholte Versuch des Erstellens des Basisobjekts in \textit{Command}. Fehlt noch ein Attribut, wird dies eine Fehlermeldung zurückliefern, welche Rückschlüsse auf das noch fehlende Attribut enthält. So können Stück für Stück die fehlenden Attribute dem Objekt hinzugefügt werden. Kann es erfolgreich in \textit{Command} erstellt werden, ist das Objekt valide und kann als Basisobjekt verwendet und sogleich wieder aus \textit{Command} gelöscht werden.
+    \item \textbf{Mittlere Schleife: Iterieren über die Deltafälle.} In diesem Schritt werden für die Entität die Deltafälle einzeln betrachtet. Dies erlaubt, ähnlich wie beim einzelnen Betrachten der Entitäten, das Wiederverwenden von bestimmten Daten, was für die korrekte Erkennung von Deltafällen in \textit{Command} notwendig ist. Das ganze Prinzip der Deltaberechnug beruht darauf, dass die Einträge in den verschiedenen Tabellen über gleiche Attributwerte als zusammengehörig erkannt werden. Das betrifft insbesondere das Attribut \enquote{nmsId} beziehungsweise das \textit{Command}-Äquivalent \enquote{visibleId}.
+    
+    An dieser Stelle kann auch eine Validierung der in der Entitäts-Konfigurationsdatei angegebenen Deltafälle durchgeführt werden. Anhand der Deltafall-Spezifikationen können diese abgeglichen und falsch formulierte oder nicht existierende Deltafälle abgefangen werden, da für diese keine Datengenerierung ausgeführt werden kann.
+    \item \textbf{Innere Schleife: Iterieren über die Testobjekttypen.} Für jeden Deltafall gibt es verschiedene Typen von Objekten, die generiert werden müssen und in der Deltafall-Konfigurationsdatei spezifiziert sind. Die verschiedenen Typen beziehen sich dabei auf die verschiedenen Tabellen beziehungsweise den Status eines Objekts in \textit{Command}. Mögliche Objekttypen sind:
+    \begin{itemize}
+        \item nms
+        \item command
+        \item planningCreate
+        \item planningDelete
+    \end{itemize}
+
+    Objekte mit Typ \enquote{nms} werden vom \ac{NMS}-Basisobjekt ausgehend generiert und später in die der Entität zugeordneten \ac{NMS}-Tabelle platziert. Basierend auf dem \textit{Command}-Basisobjekt werden Objekte mit Typ \enquote{command} direkt in \textit{Command} erstellt und besitzen dadurch den Planungsstatus \enquote{ACTUAL}. Objekte vom Typ \enquote{planning-} sind im Prinzip \enquote{command}-Objekte, werden aber mit zuvor aktiviertem Planning Protocol erstellt (\enquote{planningCreate}) beziehungsweise gelöscht (\enquote{planningDelete}) und besitzen so jeweils den Planungsstatus \enquote{PLANNED\_CREATED} oder auch \enquote{PLANNED\_DELETED}. Das Aktivieren eines Planning Protocols versetzt den User in \textit{Command} in den Planungsmodus. Wenn in diesem Modus Objekte erstellt oder gelöscht werden, übernimmt \textit{Command} diese Änderungen nicht direkt, sondern platziert diese Objekte mit einer speziellen Markierung, dem Planungsstatus, in \textit{Command}. Erst bei der Synchronisation der Daten werden die tatsächlichen Aktionen - das Erstellen oder Löschen eines Objekts - dann ausgeführt.
+
+    Beim Generieren dieser verschiedenen Objekte soll nur das erste Objekt pro Deltafall vom Basisobjekt aus komplett neu mit Werten befüllt werden. So können unnötige Schleifeniterationen über alle einzelnen Attribute der Folgeobjekte vermieden werden; das zuerst generierte Objekt wird selbst zum Referenzobjekt und nachfolgende Objekte müssen nur noch wenige Werte geringfügig abändern. Somit ist auch garantiert, dass alle Testobjekte für einen Deltafall dieselben Werte für das \enquote{nmsId}- beziehungsweise das \enquote{visibleId}-Attribut besitzen. Nach der vollständigen Generierung eines Objekts wird dieses in einer Liste gespeichert, welche alle generierten Objekte sammelt.
+    \item \textbf{Generieren von Werten.} Die Wertegenerierung selbst ist neben dem Konstruieren eines validen Basisobjekts der wichtigste Teil der Testdatengenerierung. Es ist essentiell, dass die Testdaten mit Werten gefüllt werden, die möglichst real sind, um die Kunden-Use-Cases auch tatsächlich abzudecken. (REFERENZ AUF UMFRAGE) Mithilfe von Utils-Methoden für die verschiedenen möglichen Attributarten sollen realistische Werte für alle Attribute erzeugt werden. Beispielsweise kann eine Methode speziell zur Generierung von \enquote{visibleId}-Werten existieren, welche eine aussagekräftige ID zurückliefert, die sich aus Entität und Deltafall zusammensetzt. Insgesamt sollen zunächst Methoden zur Generierung von folgenden Attributarten implementiert werden:
+    \begin{itemize}
+        \item IDs
+        \item Source Systems
+        \item IP-Adressen
+        \item Hardwareversionen
+        \item Softwareversionen
+        \item Anmerkungen
+        \item Seriennummern
+        \item Gerätetypen
+    \end{itemize}
+
+    Die Problematik bei den verschiedenen Attributarten besteht darin, dass in der Attributkonfiguration keine Aufschlüsse darauf gegeben werden, welches genaue Format ein Attribut verlangt. Lediglich die Datentypen der Attribute können ausgelesen werden, wobei diese zumeist einfache Strings sind. Die Unterscheidung der Attribute und der benötigten Werte kann daher nur über den Attributnamen geschehen. Hiefür soll die Herangehensweise mit Utils-Methoden gewählt werden, da diese sehr anschaulich und möglichst simpel ist. Je nach Attributnamen kann einfach die entsprechende Methode aufgerufen werden.
+    \item \textbf{Erstellen der Testobjekte über die \ac{BGE}.} Nach der Generierung existieren sämtliche Testobjekte lediglich als Java-Objekte. Sie müssen dementsprechend noch in die korrekten Tabellen gefüllt werden. Dies geschieht über \ac{REST}-Aufrufe der \ac{BGE}. \ac{NMS}-Objekte könen über den \ac{REST}-Endpunkt \colorbox{background}{\lstinline{\{nmsentity\}/bulkCreate}} direkt als Gruppe von Objekten gleicher Entität über einen einzigen Aufruf erstellt werden. Die restlichen Objekte müssen jedoch einzeln erstellt werden. Hierfür gibt es je nach Entität mehrere Möglichkeiten. Manche Objekte können über den Endpunkt \colorbox{background}{\lstinline{\{entity\}/create}} direkt erstellt werden, während andere, beispielsweise das Chassis, in einem Kabinett, einem Slot, einem Lagerhaus oder einer Zone platziert werden müssen. Im Fall des Chassis ist zunächst nur die Zone relevant, weshalb hier der Endpunkt \colorbox{background}{\lstinline{\{entity\}/placeInZone}} zu verwenden ist. Vor dem Erstellen oder Löschen von Testobjekten vom Typ \enquote{planningDelete} oder \enquote{planningCreate} muss das Planning Protocol aktiviert werden. Dies ist ebenfalls über die \ac{BGE} möglich; hierzu existiert der \ac{REST}-Endpunkt \colorbox{background}{\lstinline{planningProtocol/\{protocolElid\}/activate}}. Für den Objekttyp \enquote{planningCreate} werden die Objekte dann wie normale \textit{Command}-Objekte erstellt, während Objekte vom Typ \enquote{planningDelete} über den Endpunkt \colorbox{background}{\lstinline{\{entity\}/\{elid\}/delete}} gelöscht werden müssen. Abschließend wird das Planning Protocol wieder deaktiviert
+    \item \textbf{Berechnen der Deltas.} Der letzte Schritt in der erfolgreichen Generierung von Testdaten ist die Berechnung der Deltas, also der Diskrepanzen zwischen \ac{NMS}- und \textit{Command}-Tabellen. Hierfür wird ein eigens für die automatisierten Tests erstellter Testjob ausgeführt, der sämtliche Deltas im Source System der automatisierten Tests berechnet. Auch dieser Aufruf geschieht direkt aus dem Code über die \ac{BGE} mit dem \ac{REST}-Endpunkt \colorbox{background}{\lstinline{\{jobName\}/startJobSync}}. 
+\end{enumerate}
 
 

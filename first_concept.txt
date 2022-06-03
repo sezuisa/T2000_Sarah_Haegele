@@ -1,7 +1,7 @@
 == Schritt-für-Schritt-Beschreibung eines möglichen Ablaufs (Beispielhaft für Hardware) ==
 
 1) Erstellen von CSV/JSON-Dateien, welche die Anforderungen an die gewünschten Testdaten beschreiben
-    - Separate Datei für Hardware, Service, Zone&Common&Dynamic&DataCable, NMS Operations -> für jede Test Suite eine Konfigurationsdatei
+    - Separate Datei für Hardware, Service/Telco, Zonen -> für jede Test Suite eine Konfigurationsdatei
     - Entitäten (Chassis, NE, Switch Cabinet, Module, SFP, ...)
     - Pro Entität Deltafälle (CREATE, PLANNED_DELETE, ...)
 

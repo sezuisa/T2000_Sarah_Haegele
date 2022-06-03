@@ -66,4 +66,5 @@ z.B.:
   }
 
   TO DO:
-  - Implementation für Attribut/Operation "createLinkToSlot"
+  - Manchmal wird kein Chassis erstellt -> Fixen!
+  - IDs der Chassis zusammen mit den Elids speichern

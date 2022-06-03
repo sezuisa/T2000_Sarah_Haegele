@@ -18,3 +18,126 @@ Factory-Method-Pattern:
     - In der DataGeneratorSteps-Klasse wird dann für die jeweilige Instanz über die Factory ein spezifisches DataGenerator-Objekt erstellt und dessen generateTestData()-Methode aufgerufen
     - Methode zum Erstellen der Daten in Command wird auch von den einzelnen Subklassen übernommen
 
+
+
+- Optimierung: addModuleSlotCompatibility, wenn keine passenden Typen gefunden wurden (muss dann aber auch wieder zurückgesetzt werden)
+
+- Allg.: Fokus auf "Aufräumen" -> Alles, was bei der TDG erstellt und verändert wird, soll nur für die Dauer der Testausführung bestehen und dann wieder gelöscht werden
+
+- Falls es nicht mehr implementiert werden kann: Attribute aus BGE API Docs ziehen!
+URL für alle Details:
+-> http://localhost:8080/app/command/axis/api/rest/definition/entity/ENTITY?detailed
+URL für z.B. nur placeInZone:
+-> http://localhost:8080/app/command/axis/api/rest/definition/entity/chassis/operation/placeInZone
+
+-> Zumindest konzeptionieren! Dann könnte das im Zweifelsfall jemand anderes implementieren und ich kann es trotzdem in meiner Arbeit erwähnen
+
+Man könnte sich somit sparen, die Attribute wie createLinkDeviceMaster etc. über irgendwelche Statusmeldungen zu finden, sondern sie über die Kardinalität (Kardinalität 1) direkt als benötigt auslesen!
+
+- Utility-Klasse ersetzen durch Klasse, die tatsächlich instanziiert werden kann und evtl. direkt bei Instanziierung auf die Entität zugeschnitten wird? Jede DataGenerator-Klasse hat eine ValueGenerator-Klasse, welche angepasst auf die Entität Werte generieren kann? Oder zumindest in mehrere Utils-Klassen unterteilen, die spezifischer sind, damit nicht alles in einer Klasse zusammengschmissen wird (Zitate, warum Utility-Klassen nicht gut sind), z.B. https://www.jmgundersen.net/blog/utility-and-helper-classes-a-code-smell
+
+
+Aufbau der definitionResponse:
+
+{
+  "status": {
+    "errorCode": 0,
+    "message": null,
+    "subErrorCode": null,
+    "success": true
+  },
+  "definition": {
+    "id": "val",
+    "superEntityIdentifier": "val",
+    "name": "val",
+    "internalIdAttribute": "val",
+    "idAttributes": [],
+    "rest": [],
+    "types": [],
+    "attributes": [],
+    "operations": [],
+    "queries": [],
+    "relations": []
+  }
+}
+
+wichtig: operations - placeInZone/placeInSlot
+
+{
+        "id": "placeInZone",
+        "type": "CREATE",
+        "name": "Place in zone",
+        "description": "Place in zone",
+        "rest": {
+          "definition": {
+            "url": "/axis/api/rest/definition/entity/chassis/operation/placeInZone"
+          },
+          "service": {
+            "url": "/axis/api/rest/entity/chassis/placeInZone",
+            "method": "post",
+            "responseFormats": "JSON"
+          }
+        },
+        "attributes": [],
+        "returnAttributes": [],
+        "subOperations": [
+          {
+            "id": "createLinkDeviceMaster",
+            "cardinality": "1",
+            "relationDefinition": "deviceMaster",
+            "type": "CREATE",
+            "name": "Create link to Device master",
+            "description": "Creates a link to the target entity Device master",
+            "rest": {
+              "definition": {
+                "url": "/axis/api/rest/definition/entity/chassis/operation/placeInZone/suboperation/createLinkDeviceMaster"
+              }
+            },
+            "attributes": [
+              {
+                "id": "linkedElid",
+                "name": "Key Device master (Target)",
+                "key": true,
+                "nullable": false,
+                "required": true,
+                "dataType": "STRING",
+                "dataLength": 14,
+                "preDecimalPlaces": -1,
+                "decimalPlaces": -1
+              }
+            ],
+            "returnAttributes": [
+              
+            ]
+          },
+          {
+            "id": "createLinkZone",
+            "cardinality": "1",
+            "relationDefinition": "zone",
+            "type": "CREATE",
+            "name": "Create link to Zone",
+            "description": "Creates a link to the target entity Zone",
+            "rest": {
+              "definition": {
+                "url": "/axis/api/rest/definition/entity/chassis/operation/placeInZone/suboperation/createLinkZone"
+              }
+            },
+            "attributes": [
+              {
+                "id": "linkedElid",
+                "name": "Key Zone (Target)",
+                "key": true,
+                "nullable": false,
+                "required": true,
+                "dataType": "STRING",
+                "dataLength": 14,
+                "preDecimalPlaces": -1,
+                "decimalPlaces": -1
+              }
+            ],
+            "returnAttributes": [
+              
+            ]
+          }
+        ]
+      }
