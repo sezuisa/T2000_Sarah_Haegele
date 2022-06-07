@@ -104,6 +104,8 @@
 ]{hyperref}
 \usepackage{bookmark}
 \usepackage[nonumberlist,toc]{glossaries}
+\usepackage{tabularx}
+\usepackage{rotating}
 
 % Generate glossary
 \makeglossaries{}
@@ -187,6 +189,8 @@
 \definecolor{background}{HTML}{EEEEEE}
 \definecolor{delim}{RGB}{20,105,176}
 \colorlet{numb}{magenta!60!black}
+\definecolor{purple}{HTML}{9467a1}
+\definecolor{orange}{HTML}{c9823a}
  
 \lstdefinelanguage{Groovy}[]{Java}{
   keywordstyle=\color{groovyblue}\bfseries,
@@ -202,6 +206,27 @@
     literate=
      *{:}{{{\color{punct}{:}}}}{1}
       {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+	  morestring=[b]"
+}
+
+\lstdefinelanguage{csv}{
+    showstringspaces=false,
+	keywords = {CREATE, UPDATE, DELETE, UPDATE\_TYPE, PLANNED\_CREATE, PLANNED\_CREATE\_NOP, PLANNED\_CREATE\_BUT\_WITH\_ DIFFERENT\_TYPE, PLANNED\_DELETE, PLANNED\_DELETE\_NOP, PLANNED\_DELETE\_WITH\_ CREATE, PLANNED\_DELETE\_WITH\_PLANNED\_CREATE\_BUT\_WITH\_DIFFERENT\_TYPE, PLANNED\_DELETE\_WITH\_PLANNED\_CREATE, PLANNED\_DELETE\_WITH\_PLANNED\_CREATE\_NOP, PLANNED\_DELETE\_WITH\_PLANNED\_CREATE\_NOP\_DELETION, Delta, Case},
+	morekeywords = [2]{NMS\_Record, nms, Chassis},
+	morekeywords = [3]{Command\_Record, command,},
+	morekeywords = [4]{Planned\_Create\_Record, planningCreate},
+	morekeywords = [5]{Planned\_Delete\_Record, planningDelete},
+	keywordstyle = [2]{\color{delim}},
+	keywordstyle = [3]{\color{numb}},
+	keywordstyle = [4]{\color{purple}},
+	keywordstyle = [5]{\color{orange}},
+    literate=
+     *{;}{{{\color{punct}{;}}}}{1}
+      {.}{{{\color{numb}{.}}}}{1}
       {\{}{{{\color{delim}{\{}}}}{1}
       {\}}{{{\color{delim}{\}}}}}{1}
       {[}{{{\color{delim}{[}}}}{1}

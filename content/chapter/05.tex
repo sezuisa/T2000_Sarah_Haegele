@@ -1,38 +1,197 @@
 \chapter{Realisierung}\label{ch:realisierung}
-In diesem Kapitel wird die tatsächliche Umsetzung der automatischen Datengenerierung für das \ac{CIF} thematisiert. Zunächst wird eine grundsätzliche Implementierung auf Basis des im vorangegangenen Kapitel beschriebenen Konzepts für die Equipment-Entität \enquote{Chassis} dargestellt. Das darauf folgende Unterkapitel \ref{sec:tdgmodule} beschäftigt sich mit der Erweiterung der Basisimplementierung zur Unterstützung von verschiedenen auch komplexeren Entitäten am Beispiel der Subequipment-Entität \enquote{Module}. Schließlich wird im Kapitel \ref{sec:tdgtelco} noch ein Konzept für eine mögliche künftige Implementierung von Telco-Entitäten, einer weiteren Komplexitätsstufe der Entitäten, vorgestellt.
+In diesem Kapitel wird die tatsächliche Umsetzung der automatischen Datengenerierung für das \ac{CIF} thematisiert. Zunächst wird eine grundsätzliche Implementierung auf Basis des im vorangegangenen Kapitel beschriebenen Konzepts für die Equipment-Entität \enquote{Chassis} dargestellt. Das darauf folgende Unterkapitel \ref{sec:tdgmodule} beschäftigt sich mit der Erweiterung der Basisimplementierung zur Unterstützung von verschiedenen auch komplexeren Entitäten am Beispiel der Subequipment-Entität \enquote{Module}. Schließlich wird im Kapitel \ref{sec:tdgtelco} noch ein Konzept für eine mögliche künftige Implementierung von Telekommunikations-Entitäten, im Weiteren Telco-Entitäten genannt, vorgestellt.
 
 \section{Realisierung der Testdatengenerierung für Equipment-Entitäten am Beispiel der Chassis}\label{sec:tdgchassis}
-Test!
+Equipment-Entitäten sind relativ einfache Entitäten, welche für sich alleinstehend in Command platziert werden können. Sie benötigen keine weitere Objekte als Vorbedingungen, wie es bei kompelexeren Entitäten wie Modulen oder den meisten Telco-Entitäten der Fall ist. Somit bieten sich Equipment-Entitäten für eine erste und möglichst simple Implementierung einer Datengenerierung an. Zwar gibt es in Command eine Anzahl verschiedener Equipment-Entitäten, jedoch verhalten sich diese alle sehr ähnlich, sodass eine Implementierung für eine dieser Entitäten ohne großen Mehraufwand auf sämtliche Entitäten der Equipment-Kategorie ausgeweitet werden kann. Für die erste Implementierung wird sich konkret auf die Entität \enquote{Chassis} konzentriert.
 
-Es wurde sich für die Konfigurationsdateien für das \ac{CSV}-Format entschieden, da \ac{CSV}-Dateien in Programmen wie \textit{Microsoft Excel} in Tabellenform geöffnet und auch dort direkt bearbeitet werden können. \cite{excel:2022} So ist es möglich, die Konfigurationsdateien gleichzeitig gewissermaßen als Dokumentation zu verwenden, da sie auch beschreiben sollte, welche Deltafälle und Entitäten in der Datengenerierung umgesetzt sind.
+\subsection{Struktureller Aufbau der Testdatengenerierung}\label{subsec:tdgStruktur}
+In dem in Kapitel \ref{ch:sollzustand} erarbeiteten Konzept bleibt die Frage nach dem tatsächlichen strukturellen Aufbau der Testdatengenerierung offen. Auch ohne konkrete Erwähnung wird allerdings klar, dass eine Unterteilung des Prozesses in verschiedene Klassen sinnvoll und nötig ist, um das Projekt möglichst übersichtlich zu halten. Für die Strukturierung der Datengenerierung wird sich in erster Linie an den in Kapitel \ref{sec:autotestsfnt} erwähnten Vorgaben der \textit{FNT} Qualitätssicherungs-\ac{CoP} orientiert, da die automatische Testdatengenerierung als Teil des automatisierten Testprojekts \enquote{CIF Automated Tests} den Firmenstandards und -richtlinien im Bereich der Softwaretests genügen soll.
 
+Konkret bedeutet dies, dass die Testdatengenerierung von den Testklassen weg in eigene Klassen ausgelagert wird. In der eigentlichen Testmethode der \textit{setUpEnvironment}-Testsuite sollen möglichst nur Methodenaufrufe getätigt werden und keinerlei Logik zur Generierung der Testdaten implementiert werden. Dies geschieht abseits der Tests in der Klasse \textit{DataGeneratorSteps}, welche sich mit bereits existierenden \textit{Step}-Klassen im Package \textit{com.fntsoftware.api.steps} befindet. In den Testmethoden wird also lediglich die Methode \textit{setUpHardwareTestData()} in der eben erwähnten Klasse aufgerufen, welche alle weiteren logischen Schritte einleitet und zu einem über \textit{JUnit-Assertions} prüfbaren Ergebnis führt.
 
-\begin{lstlisting}[caption=Konfigurationsdatei für Deltafälle im CSV-Format, label=Delta-Spezifikationen,language=json]
-    Delta Case;NMS Record;Command Record;Planned Create Record; Planned Delete Record
-    CREATE;nms;;;
-    UPDATE;nms;command;;
-    DELETE;;command;;
-    UPDATE_TYPE;nms;command;;
-    PLANNED_CREATE;nms;;planningCreate;
-    PLANNED_CREATE_NOP;;;planningCreate;
-    PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE;nms;;planningCreate;
-    PLANNED_DELETE;;command;;planningDelete
-    PLANNED_DELETE_NOP;nms;command;;planningDelete
-    PLANNED_DELETE_WITH_CREATE;nms;command;;planningDelete
-    PLANNED_DELETE_WITH_PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE;nms;command;planningCreate;planningDelete
-    PLANNED_DELETE_WITH_PLANNED_CREATE;nms;command;planningCreate;planningDelete
-    PLANNED_DELETE_WITH_PLANNED_CREATE_NOP;nms;command;planningCreate;planningDelete
-    PLANNED_DELETE_WITH_PLANNED_CREATE_NOP_DELETION;;command;planningCreate;planningDelete
-    PRECOND;;command;;
+Um die Klasse \textit{DataGeneratorSteps} ebenfalls möglichst übersichtlich zu halten, wird der Kern der Datengenerierung - im Konzept beschrieben in Schritt 4. bis 7. - erneut in eigene Klassen ausgelagert. Hierfür wird ein neues Package erstellt, welches im Projekt über den Pfad \textit{com.fntsoftware.api.datagenerator} zu finden ist. In diesem Package befindet sich zum Einen die Klasse \textit{DataGeneratorUtils}, welche Utility-Methoden zum Generieren von Werten enthält, zum Anderen aber auch die Klasse \textit{DataGenerator}. Letztere enthält die Logik für das Generieren von Basisobjekten und den eigentlichen Testobjekten ausgehend davon.
+
+(ABBILDUNG ZUR VERDEUTLICHUNG DER STRUKTUR?)
+
+\subsection{Erstellen und Parsen der Konfigurationsdateien}\label{subsec:config}
+Bevor eine Realisierung der eigentlichen Datengenerierung erfolgen kann, müssen die Konfigurationsdateien definiert werden. Es wurde sich für hierbei für das \ac{CSV}-Format entschieden, da \ac{CSV}-Dateien in Programmen wie \textit{Microsoft Excel} in Tabellenform geöffnet und auch dort direkt bearbeitet werden können. \cite{excel:2022} Dies bietet die Möglichkeit, die Konfigurationsdateien gleichzeitig gewissermaßen als Dokumentation zu verwenden, da sie auch beschreiben, welche Deltafälle und Entitäten in der Datengenerierung bereits umgesetzt sind. Im Folgenden sind sowohl die Konfigurationsdatei für die Deltafälle als auch Datei für die Entitäten beispielhaft zunächst in der eigentlichen \ac{CSV}- und daraufhin auch in ihrer Tabellenansicht dargestellt und werden jeweils näher erläutert.
+
+\begin{lstlisting}[caption=Konfigurationsdatei für Deltafälle im CSV-Format, label=deltaConfig,language=csv,basicstyle=\scriptsize\ttfamily]
+Delta Case;NMS_Record;Command_Record;Planned_Create_Record;Planned_Delete_Record
+CREATE;nms;;;
+UPDATE;nms;command;;
+DELETE;;command;;
+UPDATE_TYPE;nms;command;;
+PLANNED_CREATE;nms;;planningCreate;
+PLANNED_CREATE_NOP;;;planningCreate;
+PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE;nms;;planningCreate;
+PLANNED_DELETE;;command;;planningDelete
+PLANNED_DELETE_NOP;nms;command;;planningDelete
+PLANNED_DELETE_WITH_CREATE;nms;command;;planningDelete
+PLANNED_DELETE_WITH_PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE;nms;command;planningCreate;planningDelete
+PLANNED_DELETE_WITH_PLANNED_CREATE;nms;command;planningCreate;planningDelete
+PLANNED_DELETE_WITH_PLANNED_CREATE_NOP;nms;command;planningCreate;planningDelete
+PLANNED_DELETE_WITH_PLANNED_CREATE_NOP_DELETION;;command;planningCreate;planningDelete
 \end{lstlisting}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=\textwidth]{delta-specifications-excel.png}
-    \caption{Konfigurationsdatei für Deltafälle in \textit{Excel}\footnotemark}
-\end{figure}
+\begin{sidewaystable}
+\begin{center}
+    \scriptsize
+    \begin{tabular}{| >{\raggedright\arraybackslash}m{39.5em} | >{\raggedright\arraybackslash}m{5em} | >{\raggedright\arraybackslash}m{7em} | >{\raggedright\arraybackslash}m{10em} | >{\raggedright\arraybackslash}m{10em} |}
+        \hline
+         Delta Case & NMS\_Record & Command\_Record & Planned\_Create\_Record & Planned\_Delete\_Record \\ 
+         \hline\hline
+         CREATE & nms & & & \\ 
+         \hline
+         UPDATE & nms & command & & \\  
+         \hline
+         DELETE & & command & & \\ 
+         \hline
+         UPDATE\_TYPE & nms & command & & \\ 
+         \hline
+         PLANNED\_CREATE & nms & & planningCreate & \\ 
+         \hline
+         PLANNED\_CREATE\_NOP & & & planningCreate & \\ 
+         \hline
+         PLANNED\_CREATE\_BUT\_WITH\_ DIFFERENT\_TYPE & nms & & planningCreate & \\ 
+         \hline
+         PLANNED\_DELETE & & command & & planningDelete \\ 
+         \hline
+         PLANNED\_DELETE\_NOP & nms & command & & planningDelete \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_ CREATE & nms & command & & planningDelete \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_PLANNED\_CREATE\_BUT\_WITH\_DIFFERENT\_TYPE & nms & command & planningCreate & planningDelete \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_PLANNED\_CREATE & nms & command & planningCreate & planningDelete \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_PLANNED\_CREATE\_NOP & nms & command & planningCreate & planningDelete \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_PLANNED\_CREATE\_NOP\_DELETION & & command & planningCreate & planningDelete \\ 
+        \hline
+    \end{tabular}
+    \caption{Konfigurationsdatei für Deltafälle in Tabellenform}\label{tab:deltaConfig}
+\end{center}
+\end{sidewaystable}
 
+Das \ac{CSV}-Format erlaubt optional die Verwendung der ersten Zeile als Kopfzeile. Dies ermöglicht eine Verbesserung der Übersichtlichkeit und der Verständlichkeit der Konfiguration insbesondere in der Tabellenform. Die Spalte \enquote{Delta Case} beinhaltet alle von den Equipment-Entitäten unterstützten und zu testenden Deltafälle. Die weiteren Spalten legen fest, in welche Tabellen Objekte platziert werden müssen, um einen Deltafall zu erfüllen. Ein Eintrag in der Spalte \enquote{NMS\_Record} bedeutet beispielsweise, dass ein \ac{NMS}-Objekt generiert und in die zur Entität gehörende \ac{NMS}-Tabelle gefüllt werden muss. Die Spalten \enquote{Planned\_Create\_Record} und \enquote{Planned\_Delete\_Record} drücken aus, dass Objekte mit aktiviertem Planning Protocol erstellt oder gelöscht werden müssen. Zu erwähnen ist, dass nur diese Konfiguration nicht ausreicht, um zwischen allen Deltafällen zu differenzieren. Wie in der Tabelle zu sehen, besitzen manche Deltafälle dieselben Anforderungen in Hinsicht auf \ac{NMS}- und \textit{Command}-Tabellen. Dies liegt daran, dass die soeben beschriebene Konfigurationsdatei keine Attributsanforderungen der Deltafälle berücksichtigt. Bei einigen Deltafälle, beispielsweise \enquote{PLANNED\_CREATE\_BUT\_WITH\_DIFFERENT\_TYPE}, müssen sich die Objekte in den verschiedenen Tabellen in bestimmten Attributwerten unterscheiden. Im genannten Fall würde das Fehlen dieser Attributsunterschiede dazu führen, dass der Deltafall als \enquote{PLANNED\_CREATE} erkannt wird, denn hierfür werden Objekte in dieselben Tabellen platziert, ohne sich dabei in ihren Attributwerten zu unterscheiden.
+
+\newpage
+\begin{lstlisting}[caption=Konfigurationsdatei für Entitäten im CSV-Format, label=entityConfig,language=csv,basicstyle=\footnotesize\ttfamily]
+Delta Case;Chassis;...
+CREATE;Chassis;...
+UPDATE;Chassis;...
+DELETE;Chassis;...
+UPDATE_TYPE;Chassis;...
+PLANNED_CREATE;Chassis;...
+PLANNED_CREATE_NOP;Chassis;...
+PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE;Chassis;...
+PLANNED_DELETE;Chassis;...
+PLANNED_DELETE_NOP;Chassis;...
+PLANNED_DELETE_WITH_CREATE;Chassis;...
+PLANNED_DELETE_WITH_PLANNED_CREATE_BUT_WITH_DIFFERENT_TYPE;Chassis;..
+PLANNED_DELETE_WITH_PLANNED_CREATE;Chassis;...
+PLANNED_DELETE_WITH_PLANNED_CREATE_NOP;Chassis;...
+PLANNED_DELETE_WITH_PLANNED_CREATE_NOP_DELETION;Chassis;...
+\end{lstlisting}
+
+\begin{table}[h]
+\begin{center}
+    \scriptsize
+    \begin{tabular}{| p{42em} | m{3em} | m{1em} |}
+        \hline
+         Delta Case & Chassis & \ldots \\ 
+         \hline\hline
+         CREATE & Chassis & \ldots \\ 
+         \hline
+         UPDATE & Chassis & \ldots \\  
+         \hline
+         DELETE & Chassis & \ldots \\ 
+         \hline
+         UPDATE\_TYPE & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_CREATE & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_CREATE\_NOP & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_CREATE\_BUT\_WITH\_ DIFFERENT\_TYPE & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_DELETE & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_DELETE\_NOP & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_ CREATE & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_PLANNED\_CREATE\_BUT\_WITH\_DIFFERENT\_TYPE & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_PLANNED\_CREATE & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_PLANNED\_CREATE\_NOP & Chassis & \ldots \\ 
+         \hline
+         PLANNED\_DELETE\_WITH\_PLANNED\_CREATE\_NOP\_DELETION & Chassis & \ldots \\ 
+        \hline
+    \end{tabular}
+    \caption{Konfigurationsdatei für Entitäten in Tabellenform}\label{tab:entityConfig}
+\end{center}
+\end{table}
+
+Auch hier wird die erste Zeile wieder als separate Kopfzeile verwendet und analog zur Deltafall-Konfiguration in Listing \ref{deltaConfig} und Tabelle \ref{tab:deltaConfig} sämtliche Deltafälle in der ersten Spalte dokumentiert. Alle weiteren Spalten dienen in dieser Konfiguration allerdings dazu, Entitäten für die Testdatengenerierung zu definieren. Ein Eintrag des Entitätsnamens in einer Zeile bedeutet hierbei, dass für diese Entität und den Deltafall in ebendieser Zeile Testdaten generiert werden sollen.
+
+Die dargestellten \ac{CSV}-Dateien können nun geparst und für den Datengenerierungsprozess verwendbar gemacht werden. Hierfür wird jeweils eine eigene statische Methode in der Klasse \colorbox{background}{\lstinline{RessourceProvider.java}} definiert, welche die Inhalte der Dateien auf Objekte vom Typ \colorbox{background}{\lstinline{LinkedHashMap<String, List<String>>}} mappt und diese zurückgibt. Der folgende Codeausschnitt zeigt eine dieser Methoden für das Parsen der Entitäts- oder auch Testdatenkonfiguration. 
+
+\begin{lstlisting}[caption=Methode zum Parsen und Mappen der Testdatenkonfiguration, label=testdataParse,language=Java]
+public static LinkedHashMap<String, List<String>> getTestDataConfiguration(String path)
+		throws IOException {
+	LinkedHashMap<String, List<String>> map = new LinkedHashMap<String, List<String>>();
+
+	List<String[]> collect = Files.lines(getConfigRessourceFile(path).toPath()).map(line -> line.split(",|;"))
+			.collect(Collectors.toList());
+
+	for (int i = 1; i < collect.size(); i++) {
+		for (int j = 1; j < collect.get(i).length; j++) {
+			if (!collect.get(i)[j].equals("")) {
+				if (!map.containsKey(collect.get(i)[j])) {
+					map.put(collect.get(i)[j], new ArrayList<>(List.of(collect.get(i)[0])));
+				} else {
+					map.computeIfAbsent(collect.get(i)[j], k -> new ArrayList<String>()).add(collect.get(i)[0]);
+				}
+			}
+		}
+	}
+}
+\end{lstlisting}
+
+Die seit Java 8 vorhandene Stream-\ac{API} ermöglicht das einfache zeilenweise Lesen einer über einen Pfad angegebenen Datei und liefert diese als String-Stream zurück. Die einzelnen Zeilenstrings können mithilfe des Methodenaufrufs \colorbox{background}{\lstinline{split(",|;")}} an den \ac{CSV}-Separatoren getrennt und so die Werte schließlich zu einer Liste gemappt werden, welche die einzelnen Zeilen als String-Arrays in ihre separaten Werte getrennt speichert. Im nächsten Schritt wird über diese Liste mithilfe von zwei verschachtelten Schleifen iteriert. Die äußere Schleife dient zur Betrachtung der Zeilen, also der kompletten String-Arrays, während die innere Schleife über die Werte der jeweils betrachteten Arrays verläuft. Hierbei steht an erster Stelle im Array immer der Deltafall, weshalb zur Filterung der Entitäten die Werte ab Index 1 des Arrays gelesen werden. Enthält das Array am momentanen Index einen Wert, also einen Entitätsnamen, wird ein Key-Value-Paar zu einer LinkedHashMap hinzugefügt, wobei der Entitätsname als Key und und der bisher ignorierte zugehörige Deltafall als Wert in Form einer ArrayList fungiert. Ist die Entität bereits in der Map enthalten, wird statt dem Hinzufügen eines neuen Key-Value-Paars die ArrayList von Deltafällen für die Entität um den zur momentan betrachteten Zeile gehörenden Fall erweitert. Nachdem beide Schleifen vollständig durchlaufen sind, enthalten die Keys der LinkedHashMap alle Entitäten und die Values für jede Entität eine Liste mit genau jenen Deltafällen, für welche die Entität in der Konfigurationsdatei definiert wurde. Der Aufruf der \textit{getTestDataConfiguration()}-Methode erfolgt als erster Schritt direkt zu Beginn der Testmethode in der \textit{setUpEnvironment}-Testsuite. Die hieraus erhaltene \textit{LinkedHashMap} mit der Konfiguration wird als Parameter an die Methode \textit{setUpHardwareTestData()} der \textit{DataGeneratorSteps}-Klasse übergeben.
+
+Das Vorgehen beim Parsen und Mappen der Deltafall-Konfigurationsdatei verläuft im Grunde ähnlich zum beschriebenen Ablauf, weshalb auf dieses nicht näher eingegangen wird. Die hierzu implementierte Methode \textit{getDeltaSpecifications()} wird jedoch erst zu Beginn der \textit{setUpHardwareTestData()}-Methode aufgerufen.
+
+ABBILDUNG ZUR VERDEUTLICHUNG DER MAP?
+
+\subsection{Iterieren über die Entitäten}\label{subsec:iterationEntities}
+Mit Beginn der äußeren Iterationsebene beginnt auch die eigentliche Testdatengenerierung. Diese Ebene findet in der \colorbox{background}{\lstinline{setUpHardwareTestData()}}-Methode statt, welche die HashMap-Repräsentation der Testdatenkonfiguration als Methodenparameter übergeben bekommt, sodass über deren Einträge mithilfe der Java-Utility-Methode \colorbox{background}{\lstinline{HashMap.entrySet()}} iteriert werden kann. Zwar sind Java-Maps eigentlich nicht mit \textit{foreach}-Schleifen kompatibel, jedoch liefert diese Methode eine Ansicht aller Mappings in einer Java-Map als \textit{Entry}-Objekte in einem Set, welches wiederum das Verwenden einer \textit{foreach}-Schleife ermöglicht. So kann ohne Schleifenzähler Eintrag für Eintrag über die Map iteriert werden und gleichzeitig über das \textit{Entry}-Objekt für den betrachteten Eintrag sowohl auf den Key als auch den Value über Getter-Methoden zugegriffen werden.
+
+
+
+\subsection{Abfragen der Attribute}\label{subsec:attributes}
+Text
+
+\subsection{Erstellen von Basisobjekten}\label{subsec:baseObjects}
 Bisherige Struktur mit POJO-Klassen für alle Entitäten wurde als unpraktisch und kompliziert evaluiert und so wurde sich entschieden, für die generische Implementierung der Testdatengenerierung diese Struktur zu verwerfen und stattdessen eine zentrale Klasse zu entwerfen, welche alle möglichen Entitäten erfassen kann. Dies ist möglich, da für die Erstellung von Objekten über die BGEs die entsprechenden Objekte lediglich als \ac{JSON}-String im Body der REST-Anfrage gesendet werden müssen - speziell auf eine Entität angepasste Klassen sind also gar nicht vonnöten.
+
+\subsection{Iterieren über die Deltafälle}\label{subsec:iterationDeltacases}
+Text
+
+\subsection{Iterieren über die Testobjekttypen}\label{subsec:iterationObjectTypes}
+Text
+
+\subsection{Generieren von Werten}\label{subsec:generatingValues}
+Text
+
+\subsection{Erstellen der Testobjekte über die BGE}\label{subsec:creatingObjectsBGE}
+Text
+
+\subsection{Berechnen der Deltas}\label{subsec:calculatingDeltas}
+Text
 
 \section{Erweiterung der Testdatengenerierung für Subequipment-Entitäten am Beispiel der Module}\label{sec:tdgmodule}
 Text

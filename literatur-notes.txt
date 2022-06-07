@@ -10,6 +10,8 @@ https://link.springer.com/chapter/10.1007/978-3-030-28494-7_6
 Buch Software Test Automation:
 Ch. 6 (Pre- & Post-Processing) -> S. 
 
+https://books.google.de/books?hl=en&lr=&id=-K72DwAAQBAJ&oi=fnd&pg=PR3&dq=java+best+practices&ots=BMLRuMHbre&sig=gnASP1KWX5lOrno5dsGqFnhBeWs&redir_esc=y#v=onepage&q=java%20best%20practices&f=false
+
 
 
 Reviewing Automatic Test Data Generation
