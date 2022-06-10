@@ -192,7 +192,7 @@
 \definecolor{purple}{HTML}{9467a1}
 \definecolor{orange}{HTML}{c9823a}
  
-\lstdefinelanguage{Groovy}[]{Java}{
+\lstdefinelanguage{Groovy}{
   keywordstyle=\color{groovyblue}\bfseries,
   stringstyle=\color{groovygreen}\ttfamily,
   keywords=[3]{each, findAll, groupBy, collect, inject, eachWithIndex},
@@ -233,3 +233,19 @@
       {]}{{{\color{delim}{]}}}}{1},
 	  morestring=[b]"
 }
+
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+ 
+\lstdefinestyle{Javastyle}{
+basicstyle=\footnotesize\ttfamily,
+keywordstyle=\color{javapurple}\bfseries,
+stringstyle=\color{javared},
+commentstyle=\color{javagreen},
+morecomment=[s][\color{javadocblue}]{/**}{*/},
+numbers=left,
+numberstyle=\tiny\color{black},
+showspaces=false,
+showstringspaces=false}

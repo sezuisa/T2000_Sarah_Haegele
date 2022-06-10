@@ -9,7 +9,7 @@ In dem in Kapitel \ref{ch:sollzustand} erarbeiteten Konzept bleibt die Frage nac
 
 Konkret bedeutet dies, dass die Testdatengenerierung von den Testklassen weg in eigene Klassen ausgelagert wird. In der eigentlichen Testmethode der \textit{setUpEnvironment}-Testsuite sollen möglichst nur Methodenaufrufe getätigt werden und keinerlei Logik zur Generierung der Testdaten implementiert werden. Dies geschieht abseits der Tests in der Klasse \textit{DataGeneratorSteps}, welche sich mit bereits existierenden \textit{Step}-Klassen im Package \textit{com.fntsoftware.api.steps} befindet. In den Testmethoden wird also lediglich die Methode \textit{setUpHardwareTestData()} in der eben erwähnten Klasse aufgerufen, welche alle weiteren logischen Schritte einleitet und zu einem über \textit{JUnit-Assertions} prüfbaren Ergebnis führt.
 
-Um die Klasse \textit{DataGeneratorSteps} ebenfalls möglichst übersichtlich zu halten, wird der Kern der Datengenerierung - im Konzept beschrieben in Schritt 4. bis 7. - erneut in eigene Klassen ausgelagert. Hierfür wird ein neues Package erstellt, welches im Projekt über den Pfad \textit{com.fntsoftware.api.datagenerator} zu finden ist. In diesem Package befindet sich zum Einen die Klasse \textit{DataGeneratorUtils}, welche Utility-Methoden zum Generieren von Werten enthält, zum Anderen aber auch die Klasse \textit{DataGenerator}. Letztere enthält die Logik für das Generieren von Basisobjekten und den eigentlichen Testobjekten ausgehend davon.
+Um die Klasse \textit{DataGeneratorSteps} ebenfalls möglichst übersichtlich zu halten, wird der Kern der Datengenerierung - im Konzept beschrieben in Schritt 4. bis 7. - erneut in eigene Klassen ausgelagert. Hierfür wird ein neues Package erstellt, welches im Projekt über den Pfad \textit{com.fntsoftware.api.datagenerator} zu finden ist. In diesem Package befindet sich zum Einen die Klasse \textit{DataGeneratorUtils}, welche Utility-Methoden zum Generieren von Werten enthält, zum Anderen aber auch die Klasse \textit{DataGenerator}. Letztere enthält mit der Methode \textit{generateTestData()} die Logik für das Generieren von Basisobjekten und den eigentlichen Testobjekten ausgehend davon.
 
 (ABBILDUNG ZUR VERDEUTLICHUNG DER STRUKTUR?)
 
@@ -170,31 +170,352 @@ ABBILDUNG ZUR VERDEUTLICHUNG DER MAP?
 \subsection{Iterieren über die Entitäten}\label{subsec:iterationEntities}
 Mit Beginn der äußeren Iterationsebene beginnt auch die eigentliche Testdatengenerierung. Diese Ebene findet in der \colorbox{background}{\lstinline{setUpHardwareTestData()}}-Methode statt, welche die HashMap-Repräsentation der Testdatenkonfiguration als Methodenparameter übergeben bekommt, sodass über deren Einträge mithilfe der Java-Utility-Methode \colorbox{background}{\lstinline{HashMap.entrySet()}} iteriert werden kann. Zwar sind Java-Maps eigentlich nicht mit \textit{foreach}-Schleifen kompatibel, jedoch liefert diese Methode eine Ansicht aller Mappings in einer Java-Map als \textit{Entry}-Objekte in einem Set, welches wiederum das Verwenden einer \textit{foreach}-Schleife ermöglicht. So kann ohne Schleifenzähler Eintrag für Eintrag über die Map iteriert werden und gleichzeitig über das \textit{Entry}-Objekt für den betrachteten Eintrag sowohl auf den Key als auch den Value über Getter-Methoden zugegriffen werden.
 
+Für die weitere Datengenerierung wird der Entitätsname in verschiedenen Varianten benötigt. Der eigentliche Name der Entität, welcher aus dem Key des \textit{Entry}-Objekts gelesen werden kann, unterscheidet sich bei manchen Entitäten vom Namen in der Datenbank oder in \ac{BGE}-\ac{REST}-Pfaden. Nach umfassender Analyse der Testdaten stellte sich beispielsweise heraus, dass die Entität \enquote{Client} in den \ac{BGE}-Operationen \enquote{Terminal} heißt. Zwar würde dies in einer ersten Implementierung zu keinem Fehler führen, da sich die Namen beim Chassis nicht unterscheiden, jedoch ist mit Hinblick auf die Erweiterbarkeit der Testdatengenerierung eine solche Besonderheit von Beginn an zu berücksichtigen. Es werden also für die betrachtete Entität in der äußeren Schleife drei separate String-Variablen mit den möglichen Varianten der Entitätsnamen definiert:
 
+\begin{itemize}
+    \item \textbf{entityName.} Der reguläre Name der Entität, welcher auch durch den Key des momentanen \textit{Entry}-Objekts repräsentiert wird.
+    \item \textbf{entityId.} Die \textit{entityId} wird aus der Entitätskonfiguration (s. Kapitel \ref{subsec:attributes}) ausgelesen und dient der Verwendung in \ac{REST}-Pfaden.
+    \item \textbf{entityTableName.} Dieser Name entspricht dem in der Datenbank verwendeten Entitätsnamen und kann ebenfalls aus der Entitätskonfiguration erhalten werden.
+\end{itemize}
 
 \subsection{Abfragen der Attribute}\label{subsec:attributes}
-Text
+Der nächste logische Schritt im Programmablauf stellt die Abfrage der Entitätsattribute dar. Diese bieten die Grundlage zur darauffolgenden Erstellung der Basisobjekte, um daraus valide Testdaten generieren zu können. Wie schon in Kapitel \ref{subsec:konzept} erwähnt, können die \ac{NMS}-Attributkonfigurationen über die \ac{BGE} abgefragt werden. Dies geschieht in zwei Schritten:
+
+\begin{enumerate}
+    \item \textit{/rest/entity/cifEntityConfiguration/query}
+    \item \textit{/rest/entity/cifEntityConfiguration/\{entityElid\}/QueryCifAttributeConfiguration}
+\end{enumerate}
+
+Im ersten Schritt wird die Entitätskonfiguration abgefragt. Hierfür wird an den \ac{REST}-Endpunkt eine Anfrage gesendet, welche den \textit{entityName} in ihrem \ac{JSON}-Body als sogenannte \enquote{Restriction}, also Sucheinschränkung, beinhaltet. Zurückgeliefert wird eine Antwort in \ac{JSON}-Form, welche im Folgenden für die Entität \enquote{Chassis} dargestellt ist.
+
+\begin{lstlisting}[caption=Entitätskonfiguration des Chassis in JSON-Form, label=entityConfigResponse,language=json]
+{
+    "commandTableName": "STCDEV_CHASSIS",
+    "elid": "QTSEUUSWNANYA8",
+    "active": "Y",
+    "commandEntityId": "CHASSIS",
+    "nmsTableName": "STFIFC_NMS_CHASSIS",
+    "synchronizationOrder": 9,
+    "deltaSqlFilename": "HardwareDelta.sql",
+    "remark": "Intermediate table to keep NMS chassis data, loaded from external system",
+    "dynamic": "N",
+    "entityName": "Chassis"
+}
+\end{lstlisting}
+
+Für das Abfragen der Attributkonfigurationen wird lediglich die \ac{Elid} der Entität benötigt, jedoch können die Attribute \textit{commandEntityId} und \textit{commandTableName} für die im vorigen Kapitel angesprochenen String-Variablen \textit{entityId} und \textit{entityTableName} verwendet werden.
+
+Um die Attributkonfigurationen zu erhalten, muss die zweite \ac{REST}-Anfrage die \ac{Elid} der Entität direkt im Pfad beinhalten. Hierfür bietet das \textit{RESTeasy} die Möglichkeit, für Methoden, welche für \ac{REST}-Anfragen verwendet werden sollen, Pfadparameter zu definieren. Hierfür werden normale Methodenparameter mit der Annotation \colorbox{background}{\lstinline{@PathParam}} versehen und so bei Ausführung des \ac{REST}-Aufrufs direkt in die im Pfad mit geschweiften Klammern markierte Stelle eingesetzt. Für Chassis ergibt sich so beispielsweise der folgende Pfad: 
+\begin{center}
+    \textit{[...]/cifEntityConfiguration/QTSEUUSWNANYA8/QueryCifAttributeConfiguration}
+\end{center}
+
+Eine Anfrage an diesen \ac{REST}-Endpunkt liefert daraufhin ein \ac{JSON}-Array bestehend aus den Konfigurationen für alle \ac{NMS}-Attribute, welche die Entität besitzt. Dieses \ac{JSON}-Array kann mithilfe der Java-Bibliothek \textit{Jackson} zu einer Java-Liste deserialisiert und, gemeinsam mit den Entitätsnamen und der Delta-Spezifikation, an die \textit{generateTestData()}-Methode in der Klasse \textit{DataGenerator} übergeben werden.
 
 \subsection{Erstellen von Basisobjekten}\label{subsec:baseObjects}
-Bisherige Struktur mit POJO-Klassen für alle Entitäten wurde als unpraktisch und kompliziert evaluiert und so wurde sich entschieden, für die generische Implementierung der Testdatengenerierung diese Struktur zu verwerfen und stattdessen eine zentrale Klasse zu entwerfen, welche alle möglichen Entitäten erfassen kann. Dies ist möglich, da für die Erstellung von Objekten über die BGEs die entsprechenden Objekte lediglich als \ac{JSON}-String im Body der REST-Anfrage gesendet werden müssen - speziell auf eine Entität angepasste Klassen sind also gar nicht vonnöten.
+Dem Erstellen von Basisobjekten fällt in der Testdatengenerierung ein besonders hoher Stellenwert zu, da sie im Grunde dafür sorgen, dass die Testdaten überhaupt valide generiert und in \textit{Command} erstellt werden können. Das Verfahren zur Erstellung dieser Objekte sollte dabei so generisch wie möglich gestaltet werden, sodass bei Erweiterungen der automatischen Testdatengenerierung keine größeren Änderungen mehr vonnöten sind. 
+
+Einerseits durch die Attributkonfig, die quasi generisch ist
+Andererseits durch generisches Testdatenobjekt (keine spezifischen Klassen für die einzelnen Entitäten, sondern alles als Key-Value-Paare in einer Map; diese kann mit einer überschriebenen \textit{toString()}-Methode zu validen \ac{JSON}-Strings konvertiert werden)
+
+Bisherige Struktur mit \ac{POJO}-Klassen für alle Entitäten wurde als unpraktisch und kompliziert evaluiert und so wurde sich entschieden, für die generische Implementierung der Testdatengenerierung diese Struktur zu verwerfen und stattdessen eine zentrale Klasse zu entwerfen, welche alle möglichen Entitäten erfassen kann. Dies ist möglich, da für die Erstellung von Objekten über die \ac{BGE} die entsprechenden Objekte lediglich als \ac{JSON}-String im Body der \ac{REST}-Anfrage gesendet werden müssen - speziell auf eine Entität angepasste Klassen sind also gar nicht vonnöten. 
+
+Jede Entität besitzt verschiedene konkrete Typen. Ein Chassis ist nicht einfach nur ein Chassis, sondern beispielsweise ein \enquote{OSN2500}-Chassis.
+D.h. Objekten muss ein valider Typ zugeordnet werden. Dies wird direkt beim Basisobjekt gemacht, sodass für viele Deltafälle der Typ nicht neu gewählt und nur bei Bedarf ein anderer Typ ausgesucht werden muss
+
+Hierfür wird eine Datenbankabfrage durchgeführt, um alle auf der zu testenden Instanz existierenden Typen einer Entität (bei Equipments auch Device Master genannt) aufgelistet zu bekommen. Sämtliche Device Master für Equipments und sogar Subequipments sind in der Datenbanktabelle \textit{STCSPC\_DEVICE} festgehalten und über den Eintrag in der Spalte \textit{CONFIG\_TABLE\_NAME} kann identifiziert werden, für welche Entität der Device Master gilt (bei Chassis sollte da \textit{STCDEV\_DEVICE}, also der \textit{entityTableName} stehen). Es wird dann ein Device Master für das Basisobjekt herausgesucht und die Liste an Device Mastern in einer Variablen gespeichert.
+
+Zuerst wird das \ac{NMS}-Basisobjekt erstellt, da hierfür direkt die Attributkonfiguration verwendet werden kann. Alle Attribute mit Wert \colorbox{background}{\lstinline{\"synchronizeToCommand\": \"Y\"}} werden in der Basisobjekt-Map als Keys mit leeren Platzhalterwerten hinzugefügt. Außerdem müssen die Attribute \textit{groupingId}, \textit{commandType} und \textit{commandZoneId} aus der Attributkonfiguration übernommen werden, obwohl diese nicht zur Synchronisation markiert sind. Sie werden allerdings für die korrekte Ausführung der Tests benötigt.
+
+\begin{lstlisting}[caption=Methode zum Erstellen eines \ac{NMS}-Basisobjekts, label=nmsBaseRecord,style=Javastyle]
+protected Map<String, String> createNmsBaseRecord(List<CifAttributeConfigurationResponse> attribConfig) {
+	HashMap<String, String> recordBase = new HashMap<>();
+
+	for (CifAttributeConfigurationResponse attrib : attribConfig) {
+		if ("Y".equals(attrib.getSynchronizeToCommand()) || "GROUPING_ID".equals(attrib.getAttrName())
+				|| "COMMAND_TYPE".equals(attrib.getAttrName()) || "COMMAND_ZONE_ID".equals(attrib.getAttrName())) {
+			if (attrib.getAttrName().equalsIgnoreCase("SOURCE_SYSTEM")) {
+				recordBase.put("nmsSourceSystem", null); // necessary because the attribute is named differently in
+															// the
+															// Cif Attribute Configuration
+			} else {
+				recordBase.put(DataGeneratorUtils.makeCamelCase(attrib.getAttrName()), null);
+			}
+		}
+	}
+	return recordBase;
+}
+\end{lstlisting}
+
+Nach dem \ac{NMS}-Basisobjekt wird das \textit{Command}-Basisobjekt erstellt. Dieses ist nicht so einfach aus der Attributkonfiguration zu erstellen, da die Attribute lediglich \ac{NMS}-Objekte zuverlässig beschreiben. Zwar können auch hier zumindest die Attribute aus der Attributkonfiguration übernommen werden, welche als zur Synchronisation relevant markiert sind - besitzen sie auch einen Wert für das Attribut \textit{commandAttribName}, so kann dieser Wert für das Basisobjekt übernommen werden. Jedoch fehlen danach immer noch Attribute, welche nicht ohne Weiteres identifizierbar sind. Um diese dennoch zu vervollständigen, wird wie folgt vorgegangen:
+
+\begin{enumerate}
+    \item Das \textit{Command}-Basisobjekt wird über die \ac{BGE} erstellt. Ist dieses noch unvollständig, liefert diese Operation einen Fehlercode und eine Fehlernachricht zurück.
+    \item Die Fehlernachricht enthält Rückschlüsse auf das noch fehlende Attribut. Sie wird analysiert und das Attribut zum Basisobjekt hinzugefügt.
+    \item Wurde in 1. ein Fehler produziert, dann wiederhole diese Schritte. Ansonsten war die Erstellung des Basisobjekts erfolgreich, das Objekt also valide, und es wird wieder aus \textit{Command} gelöscht.
+\end{enumerate}
+
+\begin{lstlisting}[caption=Vorgehen zum Vervollständigen des \textit{Command}-Basisobjekts, label=commandBaseRecord,style=Javastyle]
+do {
+    record.addRecord(commandBaseRecord);
+    response = createObjectInCommand(sessionId, record.toCommandStrings().get(0));
+    responsemapper = BaseApiBGE.getMapper().readValue(response.readEntity(String.class),
+            new TypeReference<BgeQueryResponse<BgeCreateObjectResponse>>() {
+            });
+    if (responsemapper.getStatus().getErrorCode() != 0) {
+        String msg = responsemapper.getStatus().getMessage();
+        String missingAttributeName = DataGeneratorUtils.findMissingAttribute(msg);
+        String missingAttributeValue = generateValue("", missingAttributeName.toLowerCase(), sessionId);
+        commandBaseRecord.put(missingAttributeName, missingAttributeValue);
+        record.clearRecords();
+    } else {
+        // delete checkRecord
+        restOperations.getCommandPostconditionRestOperations().deleteCommandObject(this.entityId,
+                responsemapper.getReturnData().get(0).getElid(), sessionId, "{}");
+    }
+} while (responsemapper.getStatus().getErrorCode() != 0);
+\end{lstlisting}
 
 \subsection{Iterieren über die Deltafälle}\label{subsec:iterationDeltacases}
-Text
+Nachdem valide Basisobjekte erstellt wurden, können in der mittleren und inneren Iterationsebene die Testdaten für die Deltafälle generiert werden. Die mittlere Schleife dient hierbei zur Iteration über die in der Testdatenkonfiguration definierten Liste mit den zu betrachtenden Deltafällen für die Entität. Bevor in die innere Schleife zur Wertegenerierung fortgeschritten werden kann, wird der Deltafall mit den konfigurierten Deltafällen aus der Deltafall-Spezifikation abgeglichen, damit auch nur für korrekt eingetragene Deltafälle Daten generiert werden. Wird der Deltafall nicht erkannt, kommt es zum Werfen einer Exception mit der entsprechenden Fehlermeldung: \enquote{[...] is not a valid Delta Case!}
+
+Sind alle Deltafälle für die Entität durchlaufen, wird die Schleife verlassen und die bis dorthin generierten Daten an die aufrufende Methode \textit{setUpHardwareTestData()} in der Klasse \textit{DataGeneratorSteps} zurückgegeben.
 
 \subsection{Iterieren über die Testobjekttypen}\label{subsec:iterationObjectTypes}
-Text
+In der inneren Iterationsebene wird für den in der mittleren Schleife betrachteten Deltafall über die Objekttypen iteriert, welche in der Deltafall-Spezifikation festgelegt sind. Um die einzelnen Typen zu unterscheiden, kommt eine \textit{switch-case}-Verzweigung zum Einsatz. Der erste Objekttyp, der betrachtet und, sofern benötigt, generiert wird, ist immer \enquote{nms}. Für diesen Typ wird als Referenz das \ac{NMS}-Basisobjekt verwendet und dabei Attribut für Attribut ein Wert generiert und dem zu konstruierenden neuen Testobjekt hinzugefügt. Auf die Wertegenerierung wird im nächsten Kapitel näher eingegangen.
+
+Das Generieren eines neuen Testobjekts vom Typ \enquote{command} oder auch \enquote{planningCreate} verläuft analog zum oben beschriebenen Vorgehen, jedoch wird hier das \textit{Command}-Basisobjekt als Referenz verwendet, sollte vor dem zu erstellenden Objekt noch kein weiteres erstellt worden sein. Ist dies allerdings nicht der Fall, wird statt des Basisobjekts das zuvor generierte Testobjekt als Referenz verwendet. Hierfür wird im ersten Schleifendurchgang das dort generierte Objekt einer \textit{referenceRecord}-Variablen zugewiesen. In der \textit{switch-case}-Verzweigung findet eine Überprüfung des Schleifenzählers statt - befindet sich die Schleife nicht in ihrer ersten Iteration, werden nicht mehr Attribut für Attribut am Basisobjekt entlang Werte generiert, sondern mithilfe der Methode \textit{generateSimilarRecord()} anhand des existierenden \textit{referenceRecord}-Objekts ein neues Objekt erstellt, welches die meisten Werte des Referenzobjekts übernimmt. Hiermit kann gewährleistet werden, dass zusammengehörige Testobjekte, wie es die einzelnen Objekte für einen Deltafall sind, gleiche oder zumindest ähnliche Attributwerte haben und so von \textit{Command} auch als zusammengehörig erkannt werden. Nur so kann überhaupt ein Deltafall aus den \enquote{nms}-, \enquote{command}-, \enquote{planningCreate}- und \enquote{planningDelete}-Objekten identifiziert werden.
+
+Nicht angesprochen wurde bisher das Generieren von Objekten vom Typ \enquote{planningDelete}. Der Erstellungsprozess solcher Objekte ist deutlich simpler als bei den bereits dargestellten Objekttypen, denn sie müssen gar nicht vollständig generiert werden. Um \textit{Command}-Objekte zu löschen wird lediglich die \ac{Elid} des bereits in \textit{Command} existierenden zu löschenden Objekts benötigt. Da die Testobjekte allerdings erst zu einem späteren Zeitpunkt in \textit{Command} erstellt werden und somit zum Zeitpunkt der Generierung noch keine \ac{Elid}s bekannt sind, wird für \enquote{planningDelete}-Objekte einfach nur die \textit{visibleId} des zu löschenden \textit{Command}-Objekts gespeichert. So kann später zuerst die \ac{Elid} des gewünschten Objekts über dessen \textit{visibleId} abgefragt und dieses dann anschließend gelöscht werden.
+
+Nachdem ein Testobjekt vollständig generiert wurde, wird ihm ein weiteres Attribut \textit{recordType} mit dem Objekttyp als Attributwert hinzugefügt. Dieses ist ein nur intern für die Datengenerierung verwendetes Attribut, welches in \textit{Command} nicht existiert. Es dient dazu, die verschiedenen Objekttypen voneinander zu separieren, da diese in einer gemeinsamen Liste gespeichert werden. So können die Objekte bei der Erstellung über die \ac{BGE} ihren korrekten \ac{REST}-Pfaden zugewiesen werden. 
+
+Bevor die Testobjekte zur Liste der generierten Testdaten hinzugefügt werden können, kommt es noch zu einem letzten Absicherungsschritt. Die Attribute des generierten Objekts werden auf leere Strings oder \textit{null}-Werte überprüft und Attribute mit solchen Werten gegebenenfalls entfernt. Explizit aufgeführte Attribute mit leeren Werten führen in der Erstellung über die \ac{BGE} zu Fehlern, nicht aber, wenn diese Attribute einfach komplett abwesend sind. Zwar sollte nach Abschließen der Wertegenerierungen kein Attribut einen leeren Wert enthalten, jedoch bietet diese Maßnahme eine Absicherung, falls für eine Entität in \textit{Command} beispielsweise neue Attribute konfiguriert wurden, welche in der Attributkonfiguration und dadurch auch in den Basisobjekten auftauchen, jedoch nicht von der Wertegenerierung identifiziert werden können.
+
+Im Folgenden ist ein Codeausschnitt der \textit{generateTestData()}-Methode dargestellt, welcher die Arbeitsweise der innere Schleife verdeutlicht.
+
+\begin{lstlisting}[caption=Innere Iterationsebene der Datengenerierung, label=innerLoop,style=Javastyle,basicstyle=\fontsize{9.5}{10.5}\ttfamily]
+Map<String, String> referenceRecord = new HashMap<>();
+for (int i = 0; i < deltaSpec.get(deltaCase).size(); i++) {
+    Map<String, String> newRecord = new HashMap<>();
+    String table = deltaSpec.get(deltaCase).get(i);
+    switch (table) {
+    case "nms":
+        for (Map.Entry<String, String> entry : nmsBaseRecord.entrySet()) {
+            newRecord.put(entry.getKey(), generateValue(deltaCase, entry.getKey().toLowerCase(), sessionId));
+        }
+        break;
+    case "command":
+    case "planningCreate":
+        if (i > 0) {
+            newRecord = generateSimilarRecord(referenceRecord, commandBaseRecord, attribConfig, deltaCase, table, sessionId);
+        } else {
+            for (Map.Entry<String, String> entry : commandBaseRecord.entrySet()) {
+                newRecord.put(entry.getKey(), generateValue(deltaCase, entry.getKey().toLowerCase(), sessionId));
+            }
+        }
+        break;
+    case "planningDelete":
+        newRecord.put("visibleId", generateValue(deltaCase, "visibleid", sessionId));
+        break;
+    }
+    newRecord.put("recordType", table);
+    newRecord.values().removeIf(e -> StringUtils.compare(e, "") == 0 || StringUtils.compare(e, null) == 0);
+    generated.add(newRecord);
+    if (i == 0) {
+        referenceRecord = newRecord;
+    }
+}
+\end{lstlisting}
 
 \subsection{Generieren von Werten}\label{subsec:generatingValues}
-Text
+Wie schon im Konzept in Kapitel \ref{subsec:konzept} erwähnt, sind die einzelnen Attribute nur durch ihre Namen wirklich unterscheidbar. Eine komplett generische Herangehensweise, wonach ein Wert nach vom Attribut mitgebrachten Spezifikationen erstellt wird, ist somit nicht möglich. In \textit{Command} ist nicht genau dokumentiert, welche Formate die Werte für welche Attribute haben müssen. Daraus erschließt sich, dass bei der Umsetzung selbst festgelegt werden muss, welche Art von Wert für ein bestimmtes Attribut generiert werden muss.
+
+Hierfür wird mit der Klasse \textit{DataGeneratorUtils} eine sogenannte Utility-Klasse verwendet. Utility-Klassen sind Klassen, welche nicht instanziierbar sind und eine Ansammlung von für das Programm hilfreichen und wiederverwendbaren statischen Methoden beinhalten. \cite[S. 19]{bloch:2008} Die \textit{DataGeneratorUtils}-Klasse enthält die folgenden Methoden zum Generieren von Werten:
+
+\begin{center}
+    \footnotesize
+    Legende: \textit{ENTITÄT} - Entitätsnamen; \textit{DELTAFALL} - betrachteter Deltafall; \textit{ALPHANUM} - zufälliger alphanumerischer String mit zehn Zeichen; \textit{NUM} - Zufällige Zahl zwischen 1 und 20; \textit{ELID} - \ac{Elid} des zu verlinkenden Objekts; \textit{XXX} - Zahl zwischen 0 und 256
+\end{center}
+
+\begin{longtable}[H]{| p{.45\textwidth} | p{.45\textwidth} |}
+    \hline
+    Methode & Funktion \\ 
+    \hline\hline
+    \textit{generateVisibleId()} & Generiert einen String im folgenden Format: \textit{TEST\_ + ENTITÄT\_ + DELTAFALL}. \\ 
+    \hline
+    \textit{generateUniqueId()} & Generiert eine ID im folgenden Format: \textit{TEST\_ + ENTITÄT\_ + ALPHANUM}. Es wird über eine \ac{BGE}-Abfrage überprüft, ob ein Objekt mit der generierten ID in \textit{Command} bereits existiert und gegebenenfalls eine neue ID generiert. \\  
+    \hline
+    \textit{generateZoneIds()} & Liefert ein Array mit Zonendaten zurück. Am Index 0 befindet sich die \ac{Elid} der Zone, am Index 1 die \textit{commandZoneId}, welche sich wie folgt zusammensetzt: \textit{CAMPUS|BUILDING|FLOOR|ROOM} \\ 
+    \hline
+    \textit{generateHardwareSoftwareVersion()} & Liefert ein Array mit Hardware- und Softwaredaten zurück. Am Index 0 befindet sich eine zufällig generierte Hardware-Version im Format \textit{HW Version + NUM}, am Index 1 eine Software-Version im Format \textit{SW Version + NUM}. \\ 
+    \hline
+    \textit{generateRemark()} & Generiert einen String im folgenden Format: \textit{Test ENTITÄT for delta case DELTAFALL + ALPHANUM} \\ 
+    \hline
+    \textit{generateIp()} & Generiert einen String, der eine IPv4-Adresse im Format \textit{XXX.XXX.XXX.XXX} repräsentiert \\ 
+    \hline
+    \textit{generateSerialNumber()} & Generiert einen numerischen String mit zehn Zeichen. \\ 
+    \hline
+    \textit{generateLinkString()} & Generiert einen String, welcher eine Verlinkung zu einem Device Master oder einer Zone darstellt. Er hat folgendes Format: \textit{\{``linkedElid'': ``ELID''\}} \\ 
+    \hline
+\caption{Statische Utility-Methoden und ihre Funktionen}\label{tab:utilityMethods}
+\end{longtable}
+
+Mit diesen Methoden ist es möglich, für alle benötigten Attribute des Chassis valide Werte zu generieren. Über eine normale \textit{if-else}-Verzweigung wird dann in der Methode \textit{generateValue()} ausgewählt, welche Methode zur Wertegenerierung aufgerufen werden soll. Diese Methode ist im nachfolgenden Code-Beispiel dargestellt. Zu erwähnen ist hierbei, dass die Variablen \textit{entityId}, \textit{entityName}, \textit{zoneData} und \textit{deviceMasters} als Klassenvariablen direkt zu Beginn der \textit{generateTestData()}-Methode zugewiesen beziehungsweise generiert werden, da sich diese Werte innerhalb einer Entität nicht ändern. So ist der Zugriff auf diese direkt mit dem \colorbox{background}{\lstinline{this}}-Keyword möglich und sie müssen nicht extra der \textit{generateValue()}-Methode übergeben werden.
+
+\newpage
+\begin{lstlisting}[caption=Methode zur Wertegenerierung, label=generateValue,style=Javastyle,basicstyle=\fontsize{10}{11}\ttfamily]
+protected String generateValue(String deltaCase, String attribName, String sessionId) throws IOException {
+String out = "";
+if (attribName.contains("id") && !attribName.contains("zone") && !attribName.contains("cabinet") && !attribName.contains("ne")) {
+    if (attribName.length() == 2) {
+        out = DataGeneratorUtils.generateUniqueId(this.entityId, this.entityName, sessionId);
+    } else {
+        out = DataGeneratorUtils.generateVisibleId(this.entityName, deltaCase);
+    }
+} else if (attribName.contains("sourcesystem")) {
+    out = TestConstants.SOURCE_SYSTEM;
+} else if (attribName.contains("zone") && attribName.contains("command")) {
+    out = this.zoneData[1];
+} else if (attribName.contains("version") || attribName.contains("revision")) {
+    String[] versions = DataGeneratorUtils.generateHardwareSoftwareVersion();
+    if (attribName.contains("hardware") || attribName.contains("hw")) {
+        out = versions[0];
+    } else {
+        out = versions[1];
+    }
+} else if (attribName.contains("ip")) {
+    out = DataGeneratorUtils.generateIp();
+} else if (attribName.contains("type")) {
+    out = deviceMasters.get(0);
+} else if (attribName.contains("serial")) {
+    out = DataGeneratorUtils.generateSerialNumber();
+} else if (attribName.contains("createlink")) {
+    if (attribName.contains("zone")) {
+        out = DataGeneratorUtils.generateLinkString(this.zoneData[0]);
+    } else if (attribName.contains("device")) {
+        out = DataGeneratorUtils.generateLinkString(preconditionStep.getDeviceMasterElid(sessionId, this.deviceMasters.get(0)));
+    }
+} else if (attribName.contains("remark")) {
+    out = DataGeneratorUtils.generateRemark(this.entityName, deltaCase);
+}
+return out;
+}
+\end{lstlisting}
 
 \subsection{Erstellen der Testobjekte über die BGE}\label{subsec:creatingObjectsBGE}
-Text
+Die generierten Objekte werden von der \textit{generateTestData()}-Methode gesammelt in einer Liste zurückgegeben. 
+Da die verschiedenen Objekttypen aber auf verschiedene Arten über die \ac{BGE} erstellt werden, müssen sie zunächst in einzelne Listen aufgeteilt werden. So ist es nicht nötig, für jedes Objekt gesondert zu prüfen, ob es in der \ac{NMS}-Tabelle, in \textit{Command} oder mit aktiviertem Planning Protocol erstellt werden muss. Stattdessen können die einzelnen Listen als Gruppen mit höherer Effizienz abgearbeitet werden. Das Aufteilen der Objekte geschieht über das Auslesen des in einem vorigen Schritt hinzugefügten Attributs \textit{recordType}. Die Objekte werden je nach Wert dieses Attributs in die folgenden Listen sortiert und das Attribut danach wieder von den Objekten entfernt, da es so in \textit{Command} nicht existiert.
+
+\begin{itemize}
+    \item \textit{commandData}
+    \item \textit{nmsData}
+    \item \textit{planningDeleteData}
+    \item \textit{planningCreateData}
+\end{itemize}
+
+Die Listen mit den Testobjekten werden in der obigen Reihenfolge nacheinander abgearbeitet; im ersten Schritt werden also die Objekte vom \enquote{command}-Typ aus der Liste \textit{commandData} erstellt. Das Vorgehen hierzu ist im folgenden Codebeispiel dargestellt.
+
+\begin{lstlisting}[caption=Erstellen von \textit{Command}-Objekten über die BGE, label=createCommandTestObjects,style=Javastyle]
+if (!commandData.getRecords().isEmpty()) { // commandData: Liste mit command-Testobjekten
+    List<String> commandRecords = commandData.toCommandStrings();
+    for (String s : commandRecords) {
+        try (Response resp = createObjectInCommand(sessionId, s)) {
+            if (resp.getStatus() != 200) {
+                return BaseApiBGE.getMapper().readValue(resp.readEntity(String.class), new TypeReference<BgeQueryResponse<BgeCreateObjectResponse>>() {});
+            }
+        } catch (Exception e) {
+            throw new ProcessingException(e.getMessage(), e);
+        }
+    }
+}
+\end{lstlisting}
+
+\textit{Command}-Objekte müssen einzeln nacheinander erstellt werden. Daher liefert die Methode \textit{toCommandStrings()} eine Liste von \ac{JSON}-String-Darstellungen der einzelnen Objekte, anstatt einen großen String, der als \ac{JSON}-Array alle Objekte enthält und direkt über einen \ac{REST}-Aufruf übergeben werden kann. Über diese Liste von \ac{JSON}-Strings wird iteriert und jeder einzeln über die \ac{BGE} in \textit{Command} erstellt. Hierbei wird jedes Mal anhand des vom \ac{REST}-Aufruf zurückgelieferten \ac{HTTP}-Codes überprüft, ob ein Fehler in der Erstellung aufgetreten ist. Ist dies der Fall, wird der ganze Erstellungsprozess abgebrochen und die Fehlermeldung aus der \ac{REST}-Antwort zurückgegeben, sodass der \textit{setUpEnvironment()}-Test fehlschlägt und die Fehlermeldung ausgeben kann. Diese Fehlerüberprüfung findet bei der Abarbeitung aller Listen statt.
+
+\ac{NMS}-Objekte können gruppiert in Masse erstellt werden; also kann hier die gesamte Liste wie schon zuvor erwähnt zu einem großer \ac{JSON}-String formatiert werden. Dies ist im nachfolgenden Codebeispiel dargestellt.
+
+\begin{lstlisting}[caption=Erstellen von \textit{NMS}-Objekten über die BGE, label=createNMSTestObjects,style=Javastyle]
+if (!nmsData.getRecords().isEmpty()) { // nmsData: Liste mit nms-Testobjekten
+    if (TestConstants.TEST_VERSION.equals("standard")) {
+        try (Response resp = restOperations.getNmsRestOperations().bulkCreateNmsObjectStandard("nms" + entity.toLowerCase(), sessionId, nmsData.toString())) {
+            if (resp.getStatus() != 200) {
+                return BaseApiBGE.getMapper().readValue(resp.readEntity(String.class), new TypeReference<BgeQueryResponse<BgeCreateObjectResponse>>() {});
+            }
+        } catch (Exception e) {
+            throw new ProcessingException(e.getMessage(), e);
+        }
+    } else {
+        try (Response resp = restOperations.getNmsRestOperations().bulkCreateNmsObject("nms" + entity.toLowerCase(), sessionId, nmsData.toString())) {
+            if (resp.getStatus() != 200) {
+                return BaseApiBGE.getMapper().readValue(resp.readEntity(String.class), new TypeReference<BgeQueryResponse<BgeCreateObjectResponse>>() {});
+            }
+        } catch (Exception e) {
+            throw new ProcessingException(e.getMessage(), e);
+        }
+    }
+}
+\end{lstlisting}
+
+Bei den \ac{NMS}-Objekten gibt es im Gegensatz zu den \textit{Command}-Objekten allerdings eine Besonderheit: Der \ac{BGE}-Erstellungsprozess verläuft in neueren \textit{Command}-Versionen, in welchen das \ac{CIF} bereits im Standard integriert ist, anders als in älteren Versionen. Somit muss die Version der zu testenden Instanz überprüft werden und dementsprechend verschiedene Methoden zur Erstellung der \ac{NMS}-Objekte aufgerufen werden.
+
+Bei Objekten vom Typ \enquote{planningDelete} ist eine andere Herangehensweise nötig als bei den bisher besprochenen Objekttypen, denn die Liste enthält lediglich die \textit{visibleId}-Werte der Objekte, die gelöscht werden sollen. Bevor über die Lite iteriert werden kann, muss das Planning Protocol aktiviert werden. Danach wird jeweils über die \textit{visibleId} das zu löschende Objekt aus \textit{Command} abgefragt, sodass die in der \ac{REST}-Antwort enthaltene \ac{Elid} des Objekts gespeichert werden kann. Mit dieser kann das Objekt anschließend aus \textit{Command} gelöscht werden, was im nachfolgenden Codeausschnitt abgebildet ist.
+
+\begin{lstlisting}[caption=Löschen von \enquote{planningDelete}-Objekten über die BGE, label=deletePlanningDeleteTestObjects,style=Javastyle]
+cmdBgeApiStep.activatePlanningProtocol(sessionId);
+
+if (!planningDeleteData.getRecords().isEmpty()) { // planningDeleteData: Liste mit planningDelete-Testobjekten
+    BgeRestrictionsModel restrictionsModel = new BgeRestrictionsModel();
+    for (Map<String, String> rec : planningDeleteData.getRecords()) {
+        restrictionsModel.setRestrictionSets("visibleId", new RestrictionValues("=", rec.get("visibleId")));
+        BgeQueryResponse<CommandObjectModel> commandObjectResponse = commandStep.queryCommandObjects(sessionId, restrictionsModel.toString(), commandEntityId, CommandObjectModel.class);
+
+        try (Response resp = restOperations.getCommandPostconditionRestOperations().deleteCommandObject(commandEntityId, commandObjectResponse.getReturnData().get(0).getElid(), sessionId, "{}");) {
+            if (resp.getStatus() != 200) {
+                return BaseApiBGE.getMapper().readValue(resp.readEntity(String.class), new TypeReference<BgeQueryResponse<BgeCreateObjectResponse>>() {});
+            }
+        } catch (Exception e) {
+            throw new ProcessingException(e.getMessage(), e);
+        }
+    }
+}
+\end{lstlisting}
+
+Abschließend werden die \enquote{planningCreate}-Objekte erstellt. Dies verläuft analog zu den schon besprochenen \enquote{command}-Objekten, lediglich das Planning Protocol ist zu diesem Zeitpunkt aktiviert. Nachdem die Objekte erstellt wurden, wird dieses wieder deaktiviert.
 
 \subsection{Berechnen der Deltas}\label{subsec:calculatingDeltas}
-Text
+Ob die Datengenerierung tatsächlich erfolgreich war, zeigt sich erst nach Berechnung der Deltas, also der in diesem Fall bewusst eingesetzten Diskrepanzen zwischen \ac{NMS} und \textit{Command}. Die Deltaberechnung kann durch das Starten eines Jobs über den \ac{REST}-Endpunkt \textit{\{jobName\}/startJobSync} durchgeführt werden. Da Jobs nicht nur zur Steuerung von Deltaberechnungen zuständig sind, muss der Job mit vordefinierten Einstellungen gestartet werden, die speziell auf die Berechnung von Hardware-Deltas ausgerichtet sind. Diese wurden schon zu Zeiten der manuell gepflegten Testdaten definiert, sodass keine weiteren Änderungen vorgenommen werden müssen. Die Ergebnisse der Deltaberechnung können nach Fertigstellung des Jobs in einer zur manuellen Verwaltung der Deltas dienenden Deltatabelle in \textit{Command} eingesehen werden. Diese ist im folgenden Screenshot abgebildet.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{deltatable-screenshot.png}
+    \caption{Deltatabelle nach erfolgreicher Testdatengenerierung und Deltaberechnung}
+\end{figure}
+
+\subsection{Dokumentation der Ergebnisse}\label{subsec:documentationChassis}
 
 \section{Erweiterung der Testdatengenerierung für Subequipment-Entitäten am Beispiel der Module}\label{sec:tdgmodule}
-Text
+Mit der korrekten Erkennung aller definierten Deltafälle für die von der automatischen Testdatengenerierung erstellten Chassis ist ein erstes Proof of Concept des Projekts erfolgreich abgeschlossen. Seit der Implementierung läuft die Datengenerierung bei den über \textit{Jenkins} ausgeführten automatisierten Tests mit und generiert zuverlässig Testdaten für die Tests der Chassis. Dies soll im nächsten großen Schritt jedoch auf weitere, komplexere Entitäten ausgeweitet werden. Konkret sollen Testdaten für sogenannte \enquote{Subequipments} generiert werden. Dies sind Entitäten, welche in andere Entitäten - zumeist sind dies Equipments wie Chassis - platziert werden. Um ein Testobjekt für eine Subequipment-Entität zu generieren, muss also zuvor immer auch erst ein hierfür vorgesehenes Equipment-Objekt als Vorbedingung generiert werden. Beispielhaft für Subequipment-Entitäten wird die Entität \enquote{Module} betrachtet und als Vorbedingung die bereits bekannte Equipment-Entität Chassis verwendet.
+
+\subsection{Das Factory Method Pattern}\label{subsec:factoryMethod}
+Die Erweiterung der Datengenerierung zur Unterstützung von Modules bedarf größerer Anpassungen im Code, da einige neue Logik zum Finden und zur Generierung von kompatiblen Chassis als Vorbedingung hinzugefügt werden muss. Es können nicht einfach beliebige Chassis für beliebige Modules verwendet werden, da die Slots der Chassis, in welche Modules platziert werden, fest definierte Module-Kompatibilitäten besitzen. Es ist also nicht möglich, einfach über die schon für Chassis implementierte Datengenerierung noch weitere Chassis für sämtliche Module-Deltafälle zu generieren. 
+
+Theoretisch erlaubt \textit{Command} es, beliebigen Chassis-Slots Kompatibilitäten für Module hinzuzufügen. Jedoch widerspricht diese Herangehensweise der in Kapitel \ref{sec:anforderungen} erarbeiteten Anforderung, wonach die zu testende Instanz von den ausgführten Tests möglichst nicht dauerhaft verändert werden soll. Das Hinzufügen von Slot-Kompatibilitäten führt direkt Änderungen an Geräte-Masterdaten auf der zu testenden Instanz durch und lässt so Module-Chassis-Kombinationen zu, die der realen Welt eventuell nicht entsprechen. Selbst wenn die Kompatibilität nach den Tests wieder entfernt wird, besteht die Gefahr, dass zwischenzeitlich auf der Instanz gearbeitet wird und so verfälschte Masterdaten zum Einsatz kommen. Es wird also davon abgesehen, Änderungen an Masterdaten auf einer Instanz durchzuführen, sodass für einen ausgewählten Module-Typen tatsächlich kompatible Chassis gesucht werden müssen.
+
+Um mit diesen und künftigen nötigen weiteren Vorgehensschritten die bestehende \textit{DataGenerator}-Klasse nicht immer mehr aufzublähen, wird für die Subequipment-Entitäten wie die Modules eine eigene \textit{DataGenerator}-Klasse implementiert. Hierbei kommt das sogenannte \enquote{Factory Method Pattern} zum Einsatz.
+
+Das Factory Method Pattern, manchmal auch nur als Factory Pattern oder Simple Factory Pattern bezeichnet, ist ein Software Design Pattern zum Instanziieren von bestimmten Subklassen einer Superklasse, ohne dass der Aufrufer weiß, welche Subklasse genau instanziiert wird. \cite[S. 168]{metsker:2006} \cite[S. 22]{stelting:2002} Bei diesem Pattern wird kein direkter Konstruktor aufgerufen. Die Entscheidung, welche Subklasse instanziiert wird, fällt stattdessen eine Methode in einer sogenannten \enquote{Factory-Klasse} anhand des ihr übergebenen Inputs. \cite[S. 19f.]{cooper:2000}
+
+Im Fall der Datengenerierung bedeutet dies, dass anhand des Entitätsnamens entschieden wird, welche \textit{DataGenerator}-Klasse zu instanziieren ist. Der aufrufenden Methode in der Klasse \textit{DataGeneratorSteps} ist dies egal, da sämtliche \textit{DataGenerator}-Klassen dieselbe Funktionalität anbieten und sich lediglich in ihrer konkreten Implementierung unterscheiden. Diese Herangehensweise erlaubt es auch, flexibel und relativ unkompliziert neue Varianten von \textit{DataGenerator} für weitere Entitäten hinzuzufügen. Es muss lediglich in der Factory-Klasse, welche in diesem Fall \textit{DataGeneratorFactory} genannt wird, die entsprechende Logik hinzugefügt werden, sodass für die neue Entität die korrekte Subklasse instanziiert wird. Das folgende Klassendiagramm soll den Aufbau der \enquote{Datengenerierungs-Factory} weiter verdeutlichen.
+
+KLASSENDIAGRAMM FÜR FACTORY METHOD PATTERN
+
+weiteres denkbares Design Pattern: Abstract Factory oder Builder. Factory Method ist allerdings simpler, benötigt weniger Klassen, ist also übersichtlicher, und bildet im Grunde genau die Realität bei den Testdaten ab: Je nach Entitätsgruppe sind verschiedene Vorbedingungen etc. benötigt, der allgemeine Ablauf bleibt aber gleich - daher bietet es sich an, je nach Entiätsgruppe einen darauf angepassten DataGenerator auszuwählen
+
+\subsection{Finden von kompatiblen Module-Chassis-Paaren}\label{subsec:findCompatibleTypes}
+
+\subsection{Erweiterung der \textit{generateValue()}-Methode mit Java-\textit{varargs}}\label{subsec:varargs}
+varargs in der \textit{generateValue()}-Methode
 
 \section{Erarbeiten eines Konzepts zur Testdatengenerierung für Telco-Entitäten}\label{sec:tdgtelco}
 Text
