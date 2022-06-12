@@ -2,25 +2,19 @@
 In diesem Kapitel wird auf Basis des analysierten Ist-Zustands ein Lösungskonzept für die Testdatengenerierung in automatisierten Tests für das \ac{CIF} erarbeitet und vorgestellt.
 
 \section{Anforderungsanalyse}\label{sec:anforderungen}
-Um mit dem Projekt der automatischen Testdatengenerierung einen effektiven Mehrwert für FNT bieten zu können, muss zunächst analysiert werden, welchen Anforderungen es entsprechen soll. Diese Anforderungen setzen einen Rahmen und bezeichnen einige erste Regeln und Wegweiser für die spätere Erstellung eines konkreten Lösungskonzepts, sodass dieses nachhaltig das Ziel des Projekts verwirklichen kann, eine nahezu vollständige Automatisierung der Tests durch generierte Testdaten zu erreichen.
+Um mit dem Projekt der automatischen Testdatengenerierung einen effektiven Mehrwert für FNT bieten zu können, muss zunächst analysiert werden, welchen Anforderungen es entsprechen soll. Diese Anforderungen setzen einen Rahmen und bezeichnen einige erste Regeln und Wegweiser für die spätere Erstellung eines konkreten Lösungskonzepts, sodass dieses nachhaltig das Ziel des Projekts verwirklichen kann, eine nahezu vollständige Automatisierung der Tests durch generierte Testdaten zu erreichen. Im Folgenden sind die Anforderungen an die automatische Testdatengenerierung aufgelistet.
 
-- Testdatengenerierung vor den Tests, sodass diese bei Ausführung der Tests abrufbar sind
-
-- Testdaten für sämtliche testdatenbezogene Tests des CIF sollen automatisch generiert werden (so weit wie möglich)
-
-- Testdaten sollen automatisch nach der Testausführung wieder gelöscht werden - die Testumgebung sollte nach der ausführung so weit wei möglich in ihren Ausgangszustand zurückkehren
-
-- Das Projekt muss gut dokumentiert sein, um es einfach nachvollziehen, erweitern oder warten zu können
-
-- Direkte Einbindung in das bestehende Testprojekt - "läuft das Testprojekt, läuft auch die Datengenerierung"
-
-- Testdatengenerierung soll unabhängig von der darunterliegenden \textit{Command}-Instanz funktionieren
-
-- Keine erheblichen Performance-Einbußen (mit leichten Einbußen durch die benötigte Zeit zur Datengenerierung ist zu rechnen)
-
-- Es sollten nur so viele Testdaten und nur so detailreich wie nötig generiert werden, um Performance und Komplexität zu optimieren
-
-- Es sollten nach der Implementation nahezu keine händischen Schritte in Bezug zu Testdaten mehr nötig sein
+\begin{itemize}
+    \item \textbf{Ausführungszeitpunkt.} Die Testdatengenerierung soll vor den Tests stattfinden, sodass die Testdaten bei Ausführung der Tests vollständig abrufbar sind.
+    \item \textbf{Testdatenabdeckung.} Testdaten für sämtliche testdatenbezogene Tests des CIF sollen, so weit wie möglich, automatisch generiert werden.
+    \item \textbf{Automatisierungsgrad.} Es sollen nach der Implementation nahezu keine händischen Schritte in Bezug zu Testdaten mehr nötig sein.
+    \item \textbf{Dokumentation.} Das Projekt muss gut dokumentiert sein, um es einfach nachvollziehen, erweitern oder warten zu können.
+    \item \textbf{Umgebungsbereinigung.} Testdaten sollen automatisch nach der Testausführung wieder gelöscht werden. Die Testumgebung sollte nach der Ausführung so weit möglich in ihren Ausgangszustand zurückkehren.
+    \item \textbf{Direkteinbindung.} Die automatische Testdatengenerierung soll direkt in das bestehende Testprojekt eingebunden werden - gemäß dem Prinzip \enquote{läuft das \ac{CIF} Automated Tests Projekt, so läuft auch die Datengenerierung}.
+    \item \textbf{Unabhängigkeit.} Die Testdatengenerierung soll unabhängig von der darunterliegenden \textit{Command}-Instanz funktionieren.
+    \item \textbf{Performance.} Es soll zu keinen erheblichen Performance-Einbußen durch die automatische Testdatengenerierung kommen. Mit leichten Einbußen durch die benötigte Zeit zur Datengenerierung ist aber zu rechnen.
+    \item \textbf{Komplexität.} Es sollen nur so viele Testdaten und nur so detailreich wie nötig generiert werden, um Performance und Komplexität des Projekts zu optimieren.
+\end{itemize}
 
 \section{Analyse der benötigten Testdaten}\label{sec:testdatenanalyse}
 Im nächsten Schritt erfolgt eine Analyse des \acf{SUT}. Es muss genau festgehalten werden, welche Arten von Testdaten benötigt werden und in welcher Anzahl. Ebenso muss deren Beschaffenheit und erforferliches Verhalten zum Erzielen des gewünschten Programmablaufs berücksichtigt und dokumentiert werden. 

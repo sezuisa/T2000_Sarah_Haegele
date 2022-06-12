@@ -497,6 +497,8 @@ Ob die Datengenerierung tatsächlich erfolgreich war, zeigt sich erst nach Berec
 \section{Erweiterung der Testdatengenerierung für Subequipment-Entitäten am Beispiel der Module}\label{sec:tdgmodule}
 Mit der korrekten Erkennung aller definierten Deltafälle für die von der automatischen Testdatengenerierung erstellten Chassis ist ein erstes Proof of Concept des Projekts erfolgreich abgeschlossen. Seit der Implementierung läuft die Datengenerierung bei den über \textit{Jenkins} ausgeführten automatisierten Tests mit und generiert zuverlässig Testdaten für die Tests der Chassis. Dies soll im nächsten großen Schritt jedoch auf weitere, komplexere Entitäten ausgeweitet werden. Konkret sollen Testdaten für sogenannte \enquote{Subequipments} generiert werden. Dies sind Entitäten, welche in andere Entitäten - zumeist sind dies Equipments wie Chassis - platziert werden. Um ein Testobjekt für eine Subequipment-Entität zu generieren, muss also zuvor immer auch erst ein hierfür vorgesehenes Equipment-Objekt als Vorbedingung generiert werden. Beispielhaft für Subequipment-Entitäten wird die Entität \enquote{Module} betrachtet und als Vorbedingung die bereits bekannte Equipment-Entität Chassis verwendet.
 
+Das Vorgehen zum Generieren von Daten für Modules ist grundsätzlich gleich wie bei den bereits im vorherigen Kapitel ausführlich erläuterten Chassis. Lediglich einige Zwischenschritte müssen für die Modules erfolgen, welche für die Chassis nicht benötigt wurden. Es soll in den folgenden Unterkapiteln daher nur auf diese größeren Neuerungen eingegangen werden. Zwar unterscheiden sich Modules von Chassis auch maßgeblich in ihren Attributen, jedoch ändert dies nichts an Herangehensweises wie dem Abfragen dieser Attribute oder der Erstellung von Basisobjekten. Nicht explizit erklärte Vorgänge können daher als analog zu den für die Chassis geltenden Vorgängen angenommen werden.
+
 \subsection{Das Factory Method Pattern}\label{subsec:factoryMethod}
 Die Erweiterung der Datengenerierung zur Unterstützung von Modules bedarf größerer Anpassungen im Code, da einige neue Logik zum Finden und zur Generierung von kompatiblen Chassis als Vorbedingung hinzugefügt werden muss. Es können nicht einfach beliebige Chassis für beliebige Modules verwendet werden, da die Slots der Chassis, in welche Modules platziert werden, fest definierte Module-Kompatibilitäten besitzen. Es ist also nicht möglich, einfach über die schon für Chassis implementierte Datengenerierung noch weitere Chassis für sämtliche Module-Deltafälle zu generieren. 
 
@@ -513,9 +515,40 @@ KLASSENDIAGRAMM FÜR FACTORY METHOD PATTERN
 weiteres denkbares Design Pattern: Abstract Factory oder Builder. Factory Method ist allerdings simpler, benötigt weniger Klassen, ist also übersichtlicher, und bildet im Grunde genau die Realität bei den Testdaten ab: Je nach Entitätsgruppe sind verschiedene Vorbedingungen etc. benötigt, der allgemeine Ablauf bleibt aber gleich - daher bietet es sich an, je nach Entiätsgruppe einen darauf angepassten DataGenerator auszuwählen
 
 \subsection{Finden von kompatiblen Module-Chassis-Paaren}\label{subsec:findCompatibleTypes}
+Modules können nicht für sich alleinstehend in \textit{Command} erstellt werden, sondern brauchen eine Art Elterngerät, in welches sie platziert werden. Um Testdaten für das Module zu generieren, müssen also zunächst kompatible Chassis gesucht werden. Diese Suche wird vor dem Erstellen der Basisobjekte durchgeführt, da das \textit{Command}-Basisobjekt für das Module bei seiner Erstellung in \textit{Command} platziert wird und dadurch dort bereits ein Chassis vorhanden sein muss.
 
-\subsection{Erweiterung der \textit{generateValue()}-Methode mit Java-\textit{varargs}}\label{subsec:varargs}
-varargs in der \textit{generateValue()}-Methode
+Das Finden von kompatiblen Typen verläuft größtenteils über Datenbankabfragen, da die benötigten Informationen nicht ohne Weiteres über die \ac{BGE} abrufbar sind. Nach der Abfrage der auf der Testinstanz möglichen Module Device Master wird zufällig einer dieser Typen als primärer Module-Typ ausgewählt. Aus der Datenbanktabelle \textit{STCSPC\_CHASSIS\_SLOT} können dann mit der \ac{Elid} dieses Typs als Sucheinschränkung sämtliche Chassis-Typen ausgewählt werden, welche das Module unterstützen. Zusätzlich hierzu werden für jedes prinzipiell kompatible Chassis die Namen der Slots gespeichert, in die das Module passt. Ein kompatibles Chassis kann beispielsweise auch zehn Slots besitzen, von welchen nur einer tatsächlich für das Module geeignet ist. Aus dieser Liste von möglichen Chassis mit ihren kompatiblen Slots wird nun ein Typ ausgewählt, welcher in mindestens einem Slot mindestens zwei verschiedene Module-Typen unterstützt. Dies ist notwendig für Deltafälle, die auf Typunterschieden zwischen \ac{NMS} und \textit{Command} basieren.
 
-\section{Erarbeiten eines Konzepts zur Testdatengenerierung für Telco-Entitäten}\label{sec:tdgtelco}
-Text
+Wurde ein Chassis gefunden, welches einen solchen Slot besitzt, wird aus den für den gefundenen Slot passenden Module-Typen ein sekundärer Typ ausgewählt und die \ac{Elid}s und Typnamen für sämtliche ausgewählte Typen, sowohl Module als auch Chassis, gespeichert. Den letzten Schritt der Chassis-Module-Suche stellt die Sammlung und Speicherung aller Slotnamen und Slotnummern des ausgewählten Chassis-Typs dar, welche sowohl den primären als auch den sekundären Module-Typ unterstützen. So können später bei der Generierung der Testobjekte die passenden Slots einfach zugeordnet werden.
+
+Die Liste der verfügbaren Slots pro Chassis ermöglicht es, genau auszurechnen, wie viele Chassis benötigt werden, um alle Module unterzubringen. Um die Performance zu verbessern und Ressourcen zu sparen, werden nur so viele Chassis generiert, wie auch tatsächlich nötig sind. Dies entspricht auch den aufgestellten Anforderungen in Kapitel \ref{sec:anforderungen}.
+
+\subsection{Erweiterung der \textit{generateValue()}-Methode mit Java-\textit{Varargs}}\label{subsec:varargs}
+Bevor die Basisobjekte für die Modules konstruiert werden können, müssen die Vorbedingungungen erfüllt, also die Chassis erstellt werden. Hierfür wird die bestehende \textit{generateValue()}-Methode wiederverwendet. Da diese allerdings standardmäßig Werte für Attribute wie \textit{visibleId} nach einem festen Schema aus dem Entitätsnamen und dem Deltafall der Hauptentität, also dem Module, zusammensetzt, würden so Chassis mit irreführenden \textit{visibleId}-Werten erstellt werden. Um dies zu umgehen, wird die \textit{generateValue()}-Methode mit sogenannte \textit{Varargs} erweitert. \textit{Varargs} in Java stellen eine Möglichkeit dar, Methoden um eine variable Anzahl von Parametern zu erweitern, welche dann zu einem Array zusammengefasst werden. \cite[S. 11]{naftalin:2006} In diesem Anwendungsfall können so der \textit{generateValue()}-Methode bei Bedarf ein oder mehrere vordefinierte Werte übergeben werden, die zur Wertegenerierung mitverwendet werden. Für \textit{visibleId}-Werte der für die Modules benötigten Chassis wird der Methode konkret mitgeteilt, dass es sich bei der betrachteten Entität um Chassis und nicht Modules handelt, sodass ein sprechender \textit{visibleId}-Wert generiert werden kann.
+
+CODE-BEISPIEL FÜR VARARGS
+
+Bei der Erweiterung der von allen \textit{DataGenerator}-Subklassen implementierten \textit{generateValue()}-Methode zeigt sich gut ein Nachteil des gewählten Factory Method Patterns. Wenn eine Änderung an einer vererbten Methode gemacht wird, muss diese Änderung bei allen Klassen durchgeführt werden, die diese Methode implementieren. In größeren Projekten kann dies durchaus einen erheblichen Aufwand bedeuten. 
+
+Evtl noch Logik zum Zuordnen der Slots erklären
+
+\section{Erstellen eines Konzepts zur Testdatengenerierung für Telco-Entitäten}\label{sec:tdgtelco}
+Subequipment-Entitäten stellen im Vergleich zu den primitiven Equipment-Entitäten eine höhere Komplexitätsstufe dar, da sie auf letzteren aufbauen. Theoretisch kann dies noch weitergeführt werden; Subequipments können sogar in anderen Subequipments platziert werden. Die Entitäten folgen also einer Hierarchie, wonach bei der nächsthöheren Stufe immer alle Objekte der tieferen Stufen als Vorbedingung benötigt werden. Ähnlich verhält es sich bei den Telco-Entitäten, also Entitäten, welche Telekommunikationsinfrastrukturen abbilden. Deren Hierarchie ist wie folgt aufgebaut:
+
+\begin{itemize}
+    \item Network Element oder Device (beispielsweise Chassis)
+    \item Logical Port
+    \begin{itemize}
+        \item Typ 2: wird auf Chassis platziert
+        \item Typ 3: wird auf Network Element platziert
+    \end{itemize}
+    \item Bearer: verbindet zwei Logical Ports
+    \item Services: werden auf Bearer gesetzt
+    \begin{itemize}
+        \item Path
+        \item Unrouted Path
+        \item Unrouted Multipoint
+    \end{itemize}
+\end{itemize}
+
+Auch für diese soll eine automatische Datengenerierung konzeptioniert und realisiert werden. In Anbetracht des limitierten Zeitumfangs dieser Arbeit konnte die Realisierung für die Telco-Entitäten nicht mehr durchgeführt werden, jedoch wurde ein ausführliches schriftliches Konzept erstellt, welches eine künftige Fortführung der Arbeit an der automatischen Testdatengenerierung auch anderen Entwicklern ermöglicht. Dieses Konzept ist in Gänze in Anhang B einzusehen.
