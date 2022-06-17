@@ -2,5 +2,275 @@
 
 \addchap{\appendixPhrase}
 
-\chapter{Testdatenmatrix}\label{app:testdatamatrix}
-Testdatenmatrix
+\section*{A. Befragung von professionellen Testern}\label{app:befragung}
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 1) & \gray \textbf{Could you briefly describe what exactly your job is at FNT?} \\ 
+    \hline
+    \textbf{Tester*in 1} & QA Engineer \\ 
+    \hline
+    \textbf{Tester*in 2} & QA Automation for API \& GUI tests in Command \\ 
+    \hline
+    \textbf{Tester*in 3} & I work in the QA doing the test designs, manual test execution and am also
+    developing the automated tests for mostly the Requests domain \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 2) & \gray \textbf{How important would you say the job of a tester is for the development of high
+    quality software?} \\ 
+    \hline
+    \textbf{Tester*in 1} & When it comes to quality assurance, there are several quality gates that need to
+    pass in order to deliver a high quality software. Some of these quality gates are
+    fulfilled by developers and other by testers. As testers, we ensure that the
+    application works as expected by conducting end-to-end tests. Developer's tests
+    do not cover such complex tests that testers do. So in this sense, as testers we are
+    executing tests that are as close as possible to what the customer will do and have
+    the end user perspective, therefore the tester role is vital to the success of the
+    product. \\ 
+    \hline
+    \textbf{Tester*in 2} & essential and it makes the life of developers much easier because they only need to
+    make a rough test of their funcion and the QAs can make a full regression test of
+    whatever ese could be affected by a change. \\ 
+    \hline
+    \textbf{Tester*in 3} & who ever heard of "the rule of ten" knows that it's not only important, because of
+    security reasons, but also from a monetary kind of perspective. So pretty important
+    I'd say \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 3) & \gray \textbf{Are you aware of any incidents when software had major bugs after
+    insufficient testing?} \\ 
+    \hline
+    \textbf{Tester*in 1} & Yes \\ 
+    \hline
+    \textbf{Tester*in 2} & Yes \\ 
+    \hline
+    \textbf{Tester*in 3} & No \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 4) & \gray \textbf{If yes, please elaborate.} \\ 
+    \hline
+    \textbf{Tester*in 1} & Customer reported performance issues when trying to place several objects in
+    Command. For notification-email service, the customer had a special configuration which was
+    not part of the test suite. \\ 
+    \hline
+    \textbf{Tester*in 2} & Unfortunately this appears sometimes because manual release testing is very time
+    consuming for multiple weeks and it is often not possible to make a code freeze at
+    the same moment you start testing so some functions changed after an sufficient
+    test and there is only a smoke test of the funtionality after changing. \\ 
+    \hline
+    \textbf{Tester*in 3} & I'm sure there were instances, but nothing springs to my mind currently \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 5) & \gray \textbf{Are you aware of any incidents when software had major bugs after sufficient
+    testing?} \\ 
+    \hline
+    \textbf{Tester*in 1} & No \\ 
+    \hline
+    \textbf{Tester*in 2} & No \\ 
+    \hline
+    \textbf{Tester*in 3} & No \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 6) & \gray \textbf{If yes, please elaborate.} \\ 
+    \hline
+    \textbf{Tester*in 1} & - \\ 
+    \hline
+    \textbf{Tester*in 2} & - \\ 
+    \hline
+    \textbf{Tester*in 3} & I'm sure there were instances, but nothing springs to my mind currently \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 7) & \gray \textbf{Approximately how many bugs are found per test run?} \\ 
+    \hline
+    \textbf{Tester*in 1} & Because automated tests are implemented for the regression suite, the number of
+    bugs found per test run is highly dependent on the automation coverage, the area in
+    which changes occurred and how often the tests are run. So far, the highest number
+    of bugs found per test run was 2 (several tests fail but the root cause was the same
+    and it was traced back to 2 bugs which were not caught by manual testing, but by
+    the automated tests). There are times when test runs finds no new bugs.
+    In our team, each new feature is first tested manually - where we find on average
+    10-15 bugs, then it is automated (becomes part of the regression suite). \\ 
+    \hline
+    \textbf{Tester*in 2} & Around 3 per week, but we are running around 4000 automated tests each night \\ 
+    \hline
+    \textbf{Tester*in 3} & This really depends for us automated testers if there were any recent changes, so
+    there's no definitive number I can tell. But I guess it's around two, when there were
+    bigger changes in the code \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 8) & \gray \textbf{How important do you consider the test data to be for high quality testing?} \\ 
+    \hline
+    \textbf{Tester*in 1} & Test data is of great significance for production like scenarios.  \\ 
+    \hline
+    \textbf{Tester*in 2} & Very, if possible it should be as real and (for automation) constant as possible to
+    identify in a fast way if it is reated to the change or data. \\ 
+    \hline
+    \textbf{Tester*in 3} & Because our test cases are use case driven it surely is better/important to work with
+    data that is as close as possible to the data that our users will use. \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 9) & \gray \textbf{How does it work to create test data for new tests and new test instances of
+    software?} \\ 
+    \hline
+    \textbf{Tester*in 1} & Some test data is created manually and some test data for the automated tests is
+    usually created by automated test scripts, typically via API tests.   \\ 
+    \hline
+    \textbf{Tester*in 2} & For automation some tests are prefdefined and need to be created on the reference
+    instance test-ref. For other tests we are trying to create as much data as possible in
+    preconditions of each test. \\ 
+    \hline
+    \textbf{Tester*in 3} & In my case I'm usually working with self created data through the API or GUI of the
+    test instances. In some cases there are also pre defined data sets that are created
+    with each fresh start of the instance/domain. \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 10) & \gray \textbf{How time-consuming is this and also the maintenance of test data once it has
+    been created?} \\ 
+    \hline
+    \textbf{Tester*in 1} & Usually, little to no maintenance is needed for the test data, but this depends on the
+    stability of the application. It can be the case, when the process of automatic test
+    data creation can be affected by the application's flow, and just like the automated
+    tests, the test data automation also needs to be maintained. \\ 
+    \hline
+    \textbf{Tester*in 2} & The maintenance of the predefined data is medium high, but to be honest very
+    annoying, each 1-2 weeks someone breaks data because of unintentionally changes
+    or the functionality has changed and tests are broken because data needs to be
+    changed then. \\ 
+    \hline
+    \textbf{Tester*in 3} & This also rather depends on if there were any changes to the models and objects
+    that are used. So when there are no changes to the data it's low. If there are any
+    changes it is relative to how big the changes were and if some new rules would
+    apply. (Like you can have data sets with different attributes that will of course
+    provoke different outcomes for the same case. So to cover each and every outcome
+    you of course have to create/update the matching test data). \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 11) & \gray \textbf{How do you feel about automated testing?} \\ 
+    \hline
+    \textbf{Tester*in 1} & Although the initial effort for test automation is high, the long term benefits overcome
+    this disadvantage. The main advantage of automated testing is making sure we are
+    able to release faster making sure all quality gates set in the testing process are
+    fulfilled.  \\ 
+    \hline
+    \textbf{Tester*in 2} & :) \\ 
+    \hline
+    \textbf{Tester*in 3} & It's a useful way to make regression testing less time consuming and more reliable. \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 12) & \gray \textbf{So far, FNT has created test data manually, even for automated tests. Do you
+    think automating the test data could simplify the testing process?} \\ 
+    \hline
+    \textbf{Tester*in 1} & yes  \\ 
+    \hline
+    \textbf{Tester*in 2} & Yes! \\ 
+    \hline
+    \textbf{Tester*in 3} & Yes and no. \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 13) & \gray \textbf{If so, in what way?} \\ 
+    \hline
+    \textbf{Tester*in 1} & Automating the test data is very important when it comes to portability.   \\ 
+    \hline
+    \textbf{Tester*in 2} & Data can not be broken by unintentional manual changes. The functions to create
+    the data should create valid data all the time, so the maintenance effort for data will
+    be less and if the functions to create data are already changed while development it
+    will be even faster! \\ 
+    \hline
+    \textbf{Tester*in 3} & I think this could be a great way for software in which the data models don't evolve
+    that much anymore (because the auomated data doesn't have to be updated every
+    few days/weeks). However with software that is still in the early development stage I
+    don't think that it'll simplify the testing process by a great deal, because someone
+    has still to maintain the automated test data. The other problem I could imagine with
+    auomated test data that isn't created on the fly is when problems with the
+    infrastructure are occuring (and that actually happens quite often in automated
+    testing). All tests will fail, because of missing test data. Currently usually only the few tests that would be triggered during such occurences
+    will fail and the others would still be successful. \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 14) & \gray \textbf{Some of the CIF tests are already successfully covered by an automated test
+    data generation. Do you think this could eventually be adapted even outside
+    the CIF test environment at FNT?} \\ 
+    \hline
+    \textbf{Tester*in 1} & This approach of test data generation could be applied for Command test data
+    generation, but it might be too time consuming, so it needs to be analyzed if
+    generating test data automatically is really needed as opposed to using a dump file
+    with production like data. In some situation generating test data automatically could
+    be useful and could complement the already existing test data on the instance.   \\ 
+    \hline
+    \textbf{Tester*in 2} & Interesting idea to define the data in separate files, we use constants in the test files,
+    very ugly in my opinion, so maybe we could adapt it for Command API and GUI
+    tests as well. \\ 
+    \hline
+    \textbf{Tester*in 3} & Sure. The question is rather at what point of software maturity it would make sense
+    and I can't give an answer to that, because I don't know much about this project yet. \\ 
+    \hline
+\end{longtable}
+
+\begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
+    \hline
+    \gray 15) & \gray \textbf{Do you think manual testers compete with automated testing or can manual
+    and automated testing complement each other?} \\ 
+    \hline
+    \textbf{Tester*in 1} & Surely manual and automated testing complement each other. Not every scenario
+    can be covered by automated tests, so there is still a need for manual testing,
+    especially for exploratory testing and testing workflows scenarios. \\ 
+    \hline
+    \textbf{Tester*in 2} & It can complement each other perfectly, not even for the testing itself as well for
+    preparation or identifying the right test cases to automate or the type they should be
+    automated (GUI or API). \\ 
+    \hline
+    \textbf{Tester*in 3} & Imho they complement each other, because sometimes automated testers can lose
+    focus of user experience when doing only automated (and therefore rather technical)
+    tests for a long time. However this of course really also depends on knowledge and
+    experience of the software that needs to be tested. Very niche and special test
+    cases and the related bugs are usually done and caught by manual testers. On the
+    other hand the automated tests are catching bugs faster and can narrow down
+    where the problem might come from more easily. \\ 
+    \hline
+\end{longtable}
+
+\newpage
+\section*{B. Testdatenmatrix}\label{app:testdatamatrix}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=.8\textheight, keepaspectratio, angle=90]{test-data-matrix.png}
+    \caption[]{Ausschnitt der Testdatenmatrix}
+\end{figure}

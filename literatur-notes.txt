@@ -2,6 +2,9 @@
        LITERATUR - NOTES
 ================================
 
+S. 35: Über Testdaten
+https://link.springer.com/content/pdf/10.1007/978-3-658-25087-4.pdf
+
 Buch über Software Engineering:
 https://archive.org/details/encyclopediaofso0001unse_d2y1/page/n11/mode/2up
 
@@ -13,6 +16,9 @@ Ch. 6 (Pre- & Post-Processing) -> S.
 https://books.google.de/books?hl=en&lr=&id=-K72DwAAQBAJ&oi=fnd&pg=PR3&dq=java+best+practices&ots=BMLRuMHbre&sig=gnASP1KWX5lOrno5dsGqFnhBeWs&redir_esc=y#v=onepage&q=java%20best%20practices&f=false
 
 https://en.wikipedia.org/wiki/Software_design_pattern
+
+Security Bugs are increasing:
+https://ieeexplore.ieee.org/abstract/document/6377377
 
 Reviewing Automatic Test Data Generation
 - https://www.researchgate.net/profile/Dr-Mukesh-Kumar-2/publication/334263137_Reviewing_Automatic_Test_Data_Generation/links/5d1f95e692851cf44068e314/Reviewing-Automatic-Test-Data-Generation.pdf

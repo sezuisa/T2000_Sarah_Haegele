@@ -1,14 +1,14 @@
 %!TEX root = ../../main.tex
 
 \chapter{Grundlagen}\label{ch:grundlagen}
-Dieses Kapitel befasst sich mit einigen Grundlagen, die zum Verständnis dieser Arbeit vonnöten sind. Die zwei nachfolgenden Unterkapitel können von derjenigen Leserschaft, die bereits Erfahrungen mit \textit{Command} und vor allem dem \ac{CIF} hat, übersprungen werden.
+Dieses Kapitel befasst sich mit einigen Grundlagen, die zum Verständnis dieser Arbeit vonnöten sind. Die zwei nachfolgenden Unterkapitel können von derjenigen Leserschaft, die bereits Erfahrungen mit \textit{FNT Command} und vor allem dem \ac{CIF} hat, übersprungen werden.
 
 \section{FNT Command}\label{sec:command}
-\textit{FNT Command}, im Folgenden \textit{Command} genannt, ist, wie bereits im Kapitel \ref{sec:fnt} erwähnt, eine Software zum Management von IT-, Rechenzentrums- und Telekommunikationsinfrastrukturen. In der Software können ganze Gebäude mit ihrer technischen Infrastruktur bis ins Detail virtuell abgebildet werden. \textit{Command} ermöglicht hierbei die Planung von physischen Gerätetypen, beispielsweise eines Chassis, in einzelnen Räumen eines Gebäudes bis hin zur Dokumentation von logischen Elementen wie Services.
+\textit{FNT Command}, im Folgenden \textit{Command} genannt, ist eine Software zum Management von IT-, Rechenzentrums- und Telekommunikationsinfrastrukturen. In der Software können ganze Gebäude mit ihrer technischen Infrastruktur bis ins Detail virtuell abgebildet werden. \textit{Command} ermöglicht hierbei die Planung von physischen Gerätetypen, beispielsweise Chassis, in einzelnen Räumen eines Gebäudes bis hin zur Dokumentation von logischen Elementen wie Services.
 
 \textit{Command} ist eine browserbasierte Anwendung, welche sich in die folgenden drei Schichten gliedert:
 
-ABBILDUNG
+WIP - ABBILDUNG
 
 \begin{itemize}
     \item \textit{\textbf{Frontend.}} In \textit{TypeScript}, einem Superset\footnote{Als Superset basiert \textit{TypeScript} auf \textit{JavaScript} und wird vollständig zu validem \textit{JavaScript}-Code kompiliert. \cite{ts:2021}} von \textit{JavaScript}, geschrieben, bildet das Frontend die Benutzeroberfläche im Browser ab. Benutzer der Software kommen nur mit dieser Schicht der Software in Berührung.
@@ -16,23 +16,34 @@ ABBILDUNG
     \item \textit{\textbf{Backend.}} Das Backend dient zur dauerhaften Datenspeicherung und wird durch eine \textit{Oracle}-Datenbank dargestellt. Über \textit{\ac{SQL}}-Abfragen können hier Daten direkt aus der Middleware angefordert und bearbeitet werden.
 \end{itemize}
 
+Nicht nur über das Frontend kann von außen mit \textit{Command} kommuniziert werden. Die Software bietet mit der \ac{BGW}-\ac{API} eine abstrahierte und versionsunabhängige Schnittstelle zur Interaktion mit externen Systemen. Konkret wird dabei mit einer \ac{BGE} interagiert, einer abstrakten Repräsentation einer Datenbanktabelle in \textit{Command}. Die \ac{BGW}-\ac{API} setzt sich aus vielen verschiedenen dieser \ac{BGE}s zusammen und folgt hierbei als \textit{RESTful}-\ac{API} den Architekturvorgaben des \ac{REST}. Jeder über die \ac{API} zugänglichen Ressource ist eine eindeutige \ac{URI} zugeordnet, welche eine Identifikation der Ressource im Web erlaubt. \cite{berners:2005} Gemäß \ac{REST} wird zum Informationsaustausch vor allem \ac{HTTP} verwendet. An die verschiedenen \ac{URI}s werden \ac{HTTP}-Anfragen gesendet, um auf die gewünschten Ressourcen zugreifen zu können. \cite{kalin:2013} Die Anfrage liefert eine simple Antwort im \ac{JSON}-Format zurück, ein schlankes Format zum Abbilden von Datenstrukturen, welches für Menschen leicht lesbar ist. \cite[S. 266.]{richardson:2008} 
+
+Die \textit{Command} \ac{BGW}-\ac{API} umfasst fast alle auch über das Frontend zugänglichen Funktionen und bietet so vielfältige Möglichkeiten, die Software direkt über \ac{REST}-Anfragen zu bedienen. Dies ist gerade zum automatisierten Testen von \textit{Command} ein großer Vorteil.
+
+
 \section{Das Command Integration Framework}\label{sec:cif}
-Zwar wird von \textit{Command} nach außen hin als eine große Software gesprochen, jedoch besteht diese aus vielen einzelnen und optionalen Custom-Modulen, welche ein Standard-Basismodul um zahlreiche Funktionalitäten erweitern und vom Kunden nur auf Wunsch zu diesem hinzugefügt werden. So können sich mehrere Instanzen von \textit{Command} bei verschiedenen Kunden deutlich unterscheiden. Eines der erwähnten Custom-Module, welches allerdings seit \textit{Command 13.4} in das Standardmodul integriert ist, ist das \ac{CIF}.
+Zwar wird von \textit{Command} nach außen hin als eine große Software gesprochen, jedoch besteht diese aus vielen einzelnen und optionalen Custom-Modulen, welche einige Standardmodule um zahlreiche Funktionalitäten erweitern und vom Kunden nur auf Wunsch zu diesem hinzugefügt werden. So können sich mehrere Instanzen von \textit{Command} bei verschiedenen Kunden deutlich unterscheiden. Eines der erwähnten Custom-Module, welches allerdings seit \textit{Command 13.4} als Standardmodul in \textit{Command} integriert ist, ist das \acf{CIF}.
 
-Unternehmen speichern in der Realität oft große Mengen an Daten dezentral in diversen Softwareprodukten unterschiedlicher Hersteller, was eine Übersicht über diese erschwert und somit ein erhöhtes Risiko für fehlerhaft dokumentierte Daten darstellt. Das \ac{CIF} bietet Nutzern von \textit{Command} die Möglichkeit, Daten aus Fremdsystemen in \textit{Command} zu integrieren und so zentral zu verwalten. Dessen Aufbau ist in der folgenden Abbildung ersichtlich.
+Unternehmen speichern in der Realität oft große Mengen an Daten dezentral in diversen Softwareprodukten unterschiedlicher Hersteller, was eine Übersicht über diese erschwert und somit ein erhöhtes Risiko für fehlerhaft dokumentierte Daten darstellt. (WIP - QUELLE?) Das \ac{CIF} bietet Nutzern von \textit{Command} die Möglichkeit, Daten aus Fremdsystemen in \textit{Command} zu integrieren und so zentral zu verwalten. Dessen Aufbau ist in der folgenden Abbildung ersichtlich.
 
-ABBILDUNG CIF
+WIP - ABBILDUNG CIF
 
 Das Fundament für die Datenintegration bilden die sogenannten Adapter. Ein Adapter wird genau passend für ein bestimmtes Fremdsystem eines Kunden entwickelt und dient als Schnittstelle zwischen Fremdsystem und \textit{Command}. Als solche ist der Adapter für den sogenannten \textit{ETL}-Prozess verantwortlich. Dies bedeutet, der Adapter führt eine \textbf{E}xtrahierung der Fremddaten durch, woraufhin die \textbf{T}ransformation der Daten in ein von \textit{Command} erkanntes Format erfolgt und somit ein \textbf{L}aden der transformierten Daten in die \textit{Command}-Datenbank durchgeführt kann.
 
 Die nächste Schicht des \ac{CIF} wird durch sogenannte \textit{Staging-Tabellen}, in \textit{Command} \ac{NMS}-Tabellen genannt, abgebildet. Diese dienen zur Zwischenspeicherung von Daten, nachdem diese von einem Adapter geladen wurden. Daten aus einem Fremdsystem werden nicht sofort in \textit{Command} geladen, sondern zuerst in \ac{NMS}-Tabellen zwischengespeichert, um eventuell auftretende Diskrepanzen zwischen den in \textit{Command} bereits vorhandenen und den neu geladenen Daten, sogenannte \textit{Deltas}, zu erkennen und zu bearbeiten. 
 
-Das Identifizieren dieser erwähnten Diskrepanzen erfolgt im nächsten Schritt durch die sogenannte Delta-Berechnung. Hier werden die Daten in den \ac{NMS}-Tabellen mit den in \textit{Command} vorhandenen Daten verglichen und die Differenzen in Form von Deltafällen dargestellt. Eine Übersicht über diese Deltas können Nutzer/-innen durch eine Tabelle im Web-Frontend erhalten.
+Das Identifizieren dieser erwähnten Diskrepanzen erfolgt im nächsten Schritt durch die sogenannte Delta-Berechnung. Hier werden die Daten in den \ac{NMS}-Tabellen mit den in \textit{Command} vorhandenen Daten verglichen und die Differenzen in Form von Deltafällen dargestellt. Solche Deltafälle können sein:
+\begin{itemize}
+    \item \textbf{CREATE:} Ein Objekt ist in der \ac{NMS}-Tabelle vorhanden, nicht aber in \textit{Command}. Es soll also in \textit{Command} kreiert werden.
+    \item \textbf{DELETE:} Ein Objekt ist nicht in der \ac{NMS}-Tabelle vorhanden, dafür aber in \textit{Command}. Es soll also aus \textit{Command} gelöscht werden.
+    \item  \textbf{UPDATE:} Ein Objekt ist in der \ac{NMS}-Tabelle vorhanden und in \textit{Command}, jedoch unterscheiden sich Attributwerte zwischen beiden Objekten. Es soll also das Objekt in \textit{Command} mit den neuen Werten aus der \ac{NMS}-Tabelle aktualisiert werden.
+\end{itemize}
 
-Für den nächsten Schritt, die Synchronisation der Daten, können Nutzer im Web-Frontend Einträge in der Deltatabelle genehmigen. Die Daten werden daraufhin je nach Deltafall in \textit{Command} erstellt, gelöscht oder aktualisiert.
+Zusätzlich zu diesen Deltafällen, welche bereits existierende Objekte in Echtzeit betreffen, gibt es die Möglichkeit, Objekte in \textit{Command} für eine künftige Erstellung oder Löschung zu planen. Hierfür existiert noch eine Vielzahl weiterer Deltamöglichkeiten für diverse Planungsfälle, beispielsweise \enquote{PLANNED\_CREATE} oder \enquote{PLANNED\_DELETE}. Eine Übersicht über diese Deltas können Nutzer*innen durch eine Deltatabelle im Web-Frontend erhalten.
+
+Für den nächsten Schritt, die Synchronisation der Daten, können Nutzer*innen im Web-Frontend Einträge in der Deltatabelle genehmigen. Die Daten werden daraufhin je nach Deltafall in \textit{Command} erstellt, gelöscht oder aktualisiert.
  
-Die Steuerung des beschriebenen Ablaufs zur Datenintegration in \textit{Command} über das \ac{CIF} findet über einen sogenannten Job statt.
-- Erklärung Job
+Die beschriebe Deltaberechnung und Synchronisation kann über einen sogenannten Job automatisiert und gesteuert werden. Ein Job kann über das \textit{Command}-Frontend mit verschiedenen Parametern konfiguriert werden und so bei Starten des Jobs automatisch gewünschte Vorgänge nacheinander initiieren. So kann ein Job beispielsweise konfiguriert werden, Deltas einer spezifischen Entitätskategorie wie Devices oder Zonen zu berechnen, diese über eine sogenannte \textit{Delta Auto-Apply-Konfiguration} direkt automatisch zu genehmigen und daraufhin zu synchronisieren. So sind vom Start der Deltaberechnung bis hin zum vollständigen Synchronsieren der Daten keine manuellen Eingriffe nötig.
 
 \section{Software Testing}\label{sec:swtesting}
 Dieses Unterkapitel beschreibt einige theoretische Grundlagen zum Testen von Software und schafft damit eine Basis zum Verständnis des \ac{CIF}-Testprojekts und der darauf basierenden automatischen Testdatengenerierung.
@@ -45,7 +56,7 @@ Um effektive Tests für ein System definieren zu können, muss sich ein Tester e
     \item Software sollte so früh wie möglich getestet werden. Je früher Fehler in einem System entdeckt werden, desto weniger Aufwand bereitet das Beheben dieser und desto weniger Kosten entstehen für das Unternehmen. \cite[S. 12]{witte:2019} Diese Abhängigkeit der Kosten zu Softwarefehlern in einem fortschreitenden Produktentwicklungsprozess wird durch die folgende Abbildung verdeutlicht.
 \end{itemize}
 
-ABBILDUNG basierend auf \cite[Fig. 1.3]{desikan:2006}
+WIP - ABBILDUNG basierend auf \cite[Fig. 1.3]{desikan:2006}
 
 \begin{itemize}
     \item Wird ein Fehler in einem System gefunden, muss davon ausgegangen werden, dass weitere Fehler auftreten können. Diese treten in der Regel gehäuft in einer einzelnen Softwarekomponente auf und nicht gleichmäßig verteilt auf das ganze System. \cite[S. 13]{witte:2019}
@@ -53,34 +64,28 @@ ABBILDUNG basierend auf \cite[Fig. 1.3]{desikan:2006}
     \item Tests müssen nachvollziehbar sein und dokumentiert werden. \cite[S. 14f.]{witte:2019}
 \end{itemize}
 
-Unter diesen Gesichtspunkten wird deutlich, dass Testsuites für jedes \ac{SUT} aktiv geplant und gepflegt werden müssen. Es muss genau definiert werden, welche Testfälle prinzipiell möglich sind und welche davon umgesetzt werden können, um die Kosten für die Testimplementierung und -durchführung im Rahmen zu halten und dabei gleichzeitig für eine bestmögliche Testabdeckung zu sorgen.
+Unter diesen Gesichtspunkten wird deutlich, dass Testsuites für jedes \ac{SUT} aktiv geplant und gepflegt werden müssen. Es muss genau definiert werden, welche Testfälle möglich sind und welche davon umgesetzt werden können, um die Kosten für die Testimplementierung und -durchführung im Rahmen zu halten und dabei gleichzeitig für eine bestmögliche Testabdeckung zu sorgen.
 
 \subsection{Verschiedene Konzepte zum Testen von Software}\label{subsec:testkonzepte}
-In Anbetracht der Vielfalt von Software und deren Architektur ist es nicht möglich, mit einer einzigen festen Herangehensweise an das Testen von Software jedwedes zu testende Stück Code abzudecken. Daher sind für diverse Situationen unterschiedliche Testkonzepte und -methoden entstanden. Für einige davon soll im Folgenden eine Übersicht gegeben werden.
+In Anbetracht der Vielfalt von Software und deren Architektur ist es nicht möglich, mit einer einzigen strikten Herangehensweise an das Testen von Software jedwedes zu testende Stück Code abzudecken. Daher sind für diverse Situationen unterschiedliche Testkonzepte und -methoden entstanden. Für einige davon soll im Folgenden eine Übersicht gegeben werden.
 
 \subsubsection*{Whitebox Tests}\label{subsubsec:whitebox}
 Werden auch als strukturelle Tests bezeichnet, da hierbei die interne Struktur des \ac{SUT} als Testbasis dient. Dies bedeutet, dass das System beim Testen völlig transparent und der Programmcode für die zu testende Programmfunktionalität einsehbar ist und so bestimmte Codezweige gezielt getestet werden können. \cite[S. 125f.]{oregan:2019} Whitebox Tests sind hierbei als Überbegriff für sämtliche Testverfahren anzusehen, welche ihre Tests direkt auf dem Code basieren. Dazu zählen beispielsweise Unit Tests, welche im weiteren Verlauf separat erläutert werden sollen. 
-
-Whitebox Testing erlaubt es, ein System sehr gründlich und tiefgreifend zu testen, da spezielle Verzweigungen angezielt werden können. Es können somit vielerlei Fehler sehr früh entdeckt werden. Weiterhin ist diese Methode für die Optimierung von Code durchaus förderlich, da Bottlenecks (EXPLANATION) frühzeitig erkannt werden können. Whitebox Tests sind ferner relativ einfach zu automatisieren (EXPLANATION + CITATION) und ermöglichen eine Rückverfolgung der Tests vom Code aus, um dortige Änderungen einfach in neuen Tests zu erfassen (CITATION, EXPLANATION?).
-
-Die starke Fixierung auf die Struktur eines \ac*{SUT} bringt allerdings auch Nachteile mit sich. So schlagen Whitebox Tests schnell fehl, wenn an der Implementation einer Funktionalität Änderungen durchgeführt werden. Die Tests müssen also mit dem Code geupdatet und gewartet werden. Eng hiermit verbunden besteht die Gefahr, dass bei einer neuen Implementierung, welche an der Funktionalität selbst nichts verändert, Testergebnisse fälschlischerweise positiv angezeigt werden und so tatsächliche Fehler verschleiern. Whitebox Tests können außerdem den Testprozess verkomplizieren, da sie ein bestimmtes Grad an Know-How und Vertrautheit mit dem zu testenden Code erfordern. Schließlich decken Whitebox Tests nur den Ist-Zustand eines Systems ab und stellen so nicht sicher, dass jede geforderte Funktionalität eines Systems vorhanden ist.
-
-VIELLEICHT ALS BULLET POINTS?
 
 \subsubsection*{Blackbox Tests}\label{subsubsec:blackbox}
 Ähnlich wie das Whitebox Testing ist auch das Blackbox Testing lediglich ein Überbegriff für diverse Arten von Tests. Wie sich schon am Namen ableiten lässt, stellen Blackbox Tests dabei das Gegenteil zu den Whitebox Tests dar. Sie werden auch als spezifikationsorientierte Tests bezeichnet, da sie lediglich auf das Verifizieren der korrekten Funktionalität, also den geforderten Spezifikationen, eines Systems ausgerichtet sind. Das System selbst bleibt dabei eine sogenannte Blackbox, was bedeutet, dass die innere Struktur des \ac{SUT} unbekannt ist. \cite[S. 120f.]{oregan:2019}
 
 \subsubsection*{Greybox Tests}\label{subsubsec:greybox}
-Text
+Greybox Tests stellen eine Mischform zwischen Blackbox und Whitebox Tests dar. Der Test wird wie beim Whitebox-Unittest (s. unten) vom Entwickler speziell für seinen Code geschrieben, allerdings bevor der Code selbst implementiert wird, womit die noch nicht bekannten genauen Details des zu testenden Codes den Blackbox-Aspekt wiederspiegeln. \cite[S. 86]{witte:2019}
 
-\subsubsection*{Unit Tests}\label{subsubsec:unittest}
-Auch: Modultest. White Box. Wird normalerweise direkt von Entwicklern passend für ihren neuen Code geschrieben. Einzelne Module werden auf korrekte Funktionalität geprüft. \cite[S. 75]{witte:2019}
+\subsubsection*{Unittests}\label{subsubsec:unittest}
+Unittests werden teilweise auch als Modultests bezeichnet und sind ein Whitebox-Testverfahren. Unittests werden normalerweise direkt von Entwicklern passend für den von ihnen neu implementierten Code geschrieben. Funktionale Einzelteile der Software, Module, werden dabei auf korrekte Funktionalität geprüft. \cite[S. 75]{witte:2019}
 
 \subsubsection*{Integrationstests} \label{subsubsec:integrationstests}
-Text
+Integrationstests dienen der Prüfung des Zusammenspiels verschiedener Softwarekomponenten miteinander. Hierfür wird eine Reihe von Tests aufeinander abgestimmt. \cite[S. 76]{witte:2019}
 
 \subsubsection*{Systemtests}\label{subsubsec:e2etests}
-Auch: End-To-End-Tests.
+Auch: \ac{E2E}-Tests.
 
 \subsubsection*{GUI-Tests}\label{subsubsec:guitests}
 Text
@@ -94,13 +99,27 @@ Text
 \subsubsection*{Automatisiertes Testen}\label{subsubsec:autotest}
 Test Automation Pyramid; harmoniert mit agilem Entwicklungsprozess \cite{contan:2018}
 
-ABBILDUNG TEST PYRAMID ERSTELLEN
+WIP - ABBILDUNG TEST PYRAMID ERSTELLEN
 
 \subsection{Die Bedeutung von Testdaten für effektives Software Testing}\label{subsec:testdaten}
-Idee wegen Literatur: Diverse Literaturbeispiele nehmen, überall wird erwähnt, dass Tests mit PASSENDEN Testdaten ausgeführt werden. Daraus folgt, dass Tests mit unpassenden Daten nicht durchgeführt werden können bzw. fehlschlagen und den Test damit invalidieren. Das ist ja auch logisch, denn man kann nichts auf Basis von fehlerhaften oder gar nicht der Situation entsprechenden Daten testen. Im Fall FNT: Wenn ein Deltafall "CREATE" getestet werden soll, können hierfür keine Testdaten verwendet werden, die den Deltafall "UPDATE" erzeugen, denn dann wird die "CREATE"-Operation gar nicht erst ausgeführt und ein wichtiger Teil der Software wird nicht getestet. Testdaten haben daher einen hohen Stellenwert für die Qualität der Softwaretests allgemein, da sie die Basis darstellen, ohne die Tests gar nicht erst ausgeführt werden können oder deren Ergebnisse unbrauchbar sind. Im schlimmsten Fall könnte der Test sogar ein falsches Positiv erzeugen, was eine nicht gegebene Sicherheit vermittelt und einen eventuellen Fehler verschleiert.
+Die Qualität von Softwaretests wird durch vielerlei Faktoren beeinflusst. Ein Faktor, der hierbei bisweilen als fast selbstverständlich angesehen wird, ist das Vorhandensein von Testdaten. Diese können entscheidend dafür sein, ob ein Test, sei er noch so korrekt implementiert und ausgeführt, überhaupt brauchbare Ergebnisse liefern kann.
+
+Testdaten von schlecher Qualität können der Grund sein, weshalb Tests nicht das erwartete Ergebnis anzeigen. \cite[S. 137]{oregan:2019} Ein konkretes Beispiel hierfür in der \ac{CIF}-Testumgebung kann in der Deltaberechnung theorisiert werden. Wenn der Deltafall \enquote{UPDATE} getestet werden soll, erwartet \textit{Command}, dass sich zwei Objekte mit derselben \textit{visibleId} in der \ac{NMS}-Tabelle und in \textit{Command} befinden, sich aber in bestimmten Attributwerten unterscheiden. Kam es nun aber beispielsweise bei der Erstellung der Daten zu einem Tippfehler in der \textit{visibleId}, sodass die beiden Objekte sich hierin nicht mehr entsprechen, erkennt \textit{Command} den Deltafall nicht als \enquote{UPDATE}, sondern für das \ac{NMS}-Objekt als \enquote{CREATE} und für das Objekt in \textit{Command} als \enquote{DELETE}. Der Deltafall \enquote{UPDATE} wird also gar nicht getestet; in diesem Fall würde aber der Test zumindest fehlschlagen und dadurch vermitteln, dass etwas nicht stimmt. Testdaten bestimmen also direkt den Verlauf des Testfalls, denn nur mit bestimmten Werten der Testdaten wird auch der gewünschte Pfad im \ac{SUT} eingeschlagen. \cite[S. 221]{witte:2019}
+
+Um das Beispiel weiterzuführen, wird nun angenommen, in \textit{Command} existiere ein Bug bei der Erkennung des Deltafalls \enquote{UPDATE}. Mit korrekten Testdaten könnte dieser Bug leicht identifiziert werden. Wenn aber die Testdaten schon zu verfälschten Ergebnissen führen, könnte es im schlimmsten Fall dazu kommen, dass durch den Bug in der Software der eigentlich falsch berechnete Deltafall als korrekt angesehen wird. Der Test verschleiert in diesem Fall also den Bug in der Software - aufgrund eines einfachen Fehlers wie eines Tippfehlers in der \textit{visibleId}.
+
+Auch Testdaten von hoher Qualität können mit der Zeit ihre Gültigkeit verlieren, wenn Testfälle oder die Testumgebung verändert werden. Testdaten müssen daher immer wieder geprüft und gegebenenfalls angepasst werden. \cite[S. 121f.]{witte:2019} Die Erstellung und Pflege von validen Testdaten nimmt also auch beträchtliche Zeit und Ressourcen in Anspruch, wie auch von Testern bei \textit{FNT} bestätigt wurde. Fast jede Woche müssen Anpassungen an Testdaten vorgenommen werden, weil diese durch unbeabsichtigte Änderungen an den Daten selbst oder Änderungen der Funktionalität des Systems auftreten, die mit den veralteten Testdaten Tests fehlschlagen lassen. (s. Anhang \nameref{app:befragung}, Frage 10)
+
+Testdaten sind auch ein fester Bestandteil in der Festlegung der Teststrategie für ein beliebiges \ac{SUT}. Es muss beschrieben werden, welche Testdaten verwendet werden, wo sie abgelegt sind und wie sie organisiert werden. \cite[S. 119]{witte:2019} Insbesondere in der Testautomatisierung kommt einer konsequenten Testdatenverwaltung ein besonderer Stellenwert zu, denn automatisierte Tests erfordern eine gegebene Konfiguration der Testdaten zu Beginn der Testaktivitäten. \cite[S. 236]{witte:2019}
+
+Glenford J. Myers sagt Folgendes über Testinputs:
 
 \enquote{\textit{In general, the least effective methodology of all is random-input
 testing—the process of testing a program by selecting, at random, some
 subset of all possible input values. In terms of the likelihood of detecting
 the most errors, a randomly selected collection of test cases has little
 chance of being an optimal, or even close to optimal, subset.}} \cite[S. 41]{myers:2011}
+
+Wenn also zufällige Inputdaten die schlechteste Möglichkeit zum effektiven Testen von Software sind, folgt daraus im Umkehrschluss, dass Testdaten so real und exakt wie möglich auf den Use-Case zugeschnitten sein müssen, um effektiv testen zu können. Auch dies wird von befragten Testern bei \textit{FNT} bestätigt. (s. Anhang \nameref{app:befragung}, Frage 8)
+
+Unter Berücksichtigung dieser Gesichtspunkte lässt sich schlussfolgern, dass Testdaten einen hohen Stellenwert für die Qualität der Softwaretests allgemein besitzen, da sie die Basis für Softwaretests darstellen. Ohne qualitativ hochwertige Testdaten können die Tests gar nicht erst ausgeführt werden oder deren Ergebnisse werden verfälscht und damit unbrauchbar. Im schlimmsten Fall kann ein mit unpassenden Testdaten asugeführter Test sogar ein falsches Positiv erzeugen, was eine nicht gegebene Sicherheit vermittelt und einen eventuellen Fehler verschleiert. Besteht also eine Möglichkeit, für ein Unternehmen den Testdatenerstellungsprozesses zuverlässiger zu gestalten, sollte dies in jedem Fall genauer analysiert werden.

@@ -227,7 +227,7 @@ Hierfür wird eine Datenbankabfrage durchgeführt, um alle auf der zu testenden 
 
 Zuerst wird das \ac{NMS}-Basisobjekt erstellt, da hierfür direkt die Attributkonfiguration verwendet werden kann. Alle Attribute mit Wert \colorbox{background}{\lstinline{\"synchronizeToCommand\": \"Y\"}} werden in der Basisobjekt-Map als Keys mit leeren Platzhalterwerten hinzugefügt. Außerdem müssen die Attribute \textit{groupingId}, \textit{commandType} und \textit{commandZoneId} aus der Attributkonfiguration übernommen werden, obwohl diese nicht zur Synchronisation markiert sind. Sie werden allerdings für die korrekte Ausführung der Tests benötigt.
 
-\begin{lstlisting}[caption=Methode zum Erstellen eines \ac{NMS}-Basisobjekts, label=nmsBaseRecord,style=Javastyle]
+\begin{lstlisting}[caption=Methode zum Erstellen eines NMS-Basisobjekts, label=nmsBaseRecord,style=Javastyle]
 protected Map<String, String> createNmsBaseRecord(List<CifAttributeConfigurationResponse> attribConfig) {
 	HashMap<String, String> recordBase = new HashMap<>();
 
@@ -551,4 +551,4 @@ Subequipment-Entitäten stellen im Vergleich zu den primitiven Equipment-Entitä
     \end{itemize}
 \end{itemize}
 
-Auch für diese soll eine automatische Datengenerierung konzeptioniert und realisiert werden. In Anbetracht des limitierten Zeitumfangs dieser Arbeit konnte die Realisierung für die Telco-Entitäten nicht mehr durchgeführt werden, jedoch wurde ein ausführliches schriftliches Konzept erstellt, welches eine künftige Fortführung der Arbeit an der automatischen Testdatengenerierung auch anderen Entwicklern ermöglicht. Dieses Konzept ist in Gänze in Anhang B einzusehen.
+Auch für diese soll eine automatische Datengenerierung konzeptioniert und realisiert werden. In Anbetracht des limitierten Zeitumfangs dieser Arbeit konnte die Realisierung für die Telco-Entitäten nicht mehr durchgeführt werden, jedoch wurde ein ausführliches schriftliches Konzept erstellt, welches eine künftige Fortführung der Arbeit an der automatischen Testdatengenerierung auch anderen Entwicklern ermöglicht. Dieses Konzept ist in Gänze in Anhang C einzusehen.

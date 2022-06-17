@@ -106,6 +106,9 @@
 \usepackage[nonumberlist,toc]{glossaries}
 \usepackage{tabularx}
 \usepackage{rotating}
+\usepackage{colortbl}
+\usepackage{caption}
+\usepackage{nameref}
 
 % Generate glossary
 \makeglossaries{}
@@ -185,16 +188,22 @@
 \definecolor{groovyblue}{HTML}{0000A0}
 \definecolor{groovygreen}{HTML}{008000}
 \definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{lightgray}{RGB}{173,173,173}
 \colorlet{punct}{red!60!black}
 \definecolor{background}{HTML}{EEEEEE}
 \definecolor{delim}{RGB}{20,105,176}
 \colorlet{numb}{magenta!60!black}
 \definecolor{purple}{HTML}{9467a1}
 \definecolor{orange}{HTML}{c9823a}
+
+\definecolor{good}{HTML}{c6efce}
+\definecolor{neutral}{HTML}{ffeb9c}
+\definecolor{bad}{HTML}{ffc7ce}
  
-\lstdefinelanguage{Groovy}{
+\lstdefinelanguage{Groovy}[]{Java}{
   keywordstyle=\color{groovyblue}\bfseries,
   stringstyle=\color{groovygreen}\ttfamily,
+  showstringspaces=false,
   keywords=[3]{each, findAll, groupBy, collect, inject, eachWithIndex},
   morekeywords={def, as, in, use},
   moredelim=[is][\textcolor{darkgray}]{\%\%}{\%\%},
@@ -203,6 +212,7 @@
 
 \lstdefinelanguage{json}{
     showstringspaces=false,
+	stringstyle=\color{javared},
     literate=
      *{:}{{{\color{punct}{:}}}}{1}
       {,}{{{\color{punct}{,}}}}{1}
@@ -249,3 +259,5 @@ numbers=left,
 numberstyle=\tiny\color{black},
 showspaces=false,
 showstringspaces=false}
+
+\newcommand{\gray}{\cellcolor{lightgray}}
