@@ -2,7 +2,9 @@
 
 \addchap{\appendixPhrase}
 
-\section*{A. Befragung von professionellen Testern}\label{app:befragung}
+\section*{A. Expertenbefragung}\label{app:befragung}
+Im Zuge der des Projekts der automatischen Testdatengenerierung wurde eine anonyme Befragung von drei professionellen Tester*innen bei \textit{FNT} durchgeführt. Die gestellten Fragen und gegebenen Antworten sind im Folgenden im Originaltext aufgeführt.
+
 \begin{longtable}[H]{| p{.2\textwidth} | p{.7\textwidth} |}
     \hline
     \gray 1) & \gray \textbf{Could you briefly describe what exactly your job is at FNT?} \\ 
@@ -269,8 +271,67 @@
 
 \newpage
 \section*{B. Testdatenmatrix}\label{app:testdatamatrix}
-\begin{figure}[!ht]
+\begin{figure}[h!t]
     \centering
-    \includegraphics[width=.8\textheight, keepaspectratio, angle=90]{test-data-matrix.png}
-    \caption[]{Ausschnitt der Testdatenmatrix}
+    \includegraphics[width=.9\textheight, keepaspectratio, angle=90]{test-data-matrix.png}
+    \caption[]{Ausschnitt der Testdatenmatrix, genauer aus der Teilmatrix \enquote{Device Data}}
 \end{figure}
+
+\newpage
+\section*{C. Ausschnitt eines Rückgabewerts in der \ac{BGW}-Dokumentation}\label{app:bgeDoku}
+\begin{lstlisting}[language=json, basicstyle=\scriptsize\ttfamily]
+    {
+        "id": "placeInZone",
+        "type": "CREATE",
+        "name": "Place in zone",
+        "description": "Place in zone",
+        "rest": {
+          "definition": {
+            "url": "/axis/api/rest/definition/entity/chassis/operation/placeInZone"
+          },
+          "service": {
+            "url": "/axis/api/rest/entity/chassis/placeInZone",
+            "method": "post",
+            "responseFormats": "JSON"
+          }
+        },
+        "attributes": [],
+        "returnAttributes": [],
+        "subOperations": [
+          {
+            "id": "createLinkDeviceMaster",
+            "cardinality": "1",
+            "relationDefinition": "deviceMaster",
+            "type": "CREATE",
+            "name": "Create link to Device master",
+            "description": "Creates a link to the target entity Device master",
+            "rest": {
+              "definition": {
+                "url": "/axis/api/rest/definition/entity/chassis/operation/placeInZone/suboperation/createLinkDeviceMaster"
+              }
+            },
+            "attributes": [
+              {
+                "id": "linkedElid",
+                "name": "Key Device master (Target)",
+                "key": true,
+                "nullable": false,
+                "required": true,
+                "dataType": "STRING",
+                "dataLength": 14,
+                "preDecimalPlaces": -1,
+                "decimalPlaces": -1
+              }
+            ],
+            "returnAttributes": []
+          },
+          ...
+        ],
+        ...
+    }
+\end{lstlisting}
+
+\newpage
+\section*{D. Ausschnitt aus dem Konzept zur Testdatengenerierung von Telco-Entitäten}\label{app:telcoKonzept}
+Die nächsten drei Seiten sind ein Ausschnitt aus dem PDF-Dokument, welches das schriftliche Konzept für die automatische Testdatengenerierung von Telco-Entitäten darstellt. Konkret behandelt der Ausschnitt die Telco-Entität Bearer. Die Abkürzung \enquote{NE} bezeichnet hierbei ein Objekt der Entität Network Element.
+\includepdf[pages={10,11,12}]{files/TDG_Concept_Telco.pdf}

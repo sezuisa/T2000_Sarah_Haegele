@@ -39,63 +39,15 @@ DATA_SOCKET - Y
 DEVICE_MISC - Y
 
 
-Interview mit Sviatlana Koch:
-- Könntest du kurz beschreiben, was genau deine Aufgabe bei FNT ist?
 
-- Als wie wichtig für die Entwicklung qualitativ hochwertiger Software würdest du deine Tätigkeit einschätzen?
+TO DO
 
-- Gab es schon einmal Vorfälle in deiner Zeit als Testerin, als Software nach nicht ausreichendem Testen größere Fehler hatte?
+- Grundsätzliches zur automatischen Testdatengenerierung (wie funktioniert so etwas überhaupt? Auf welchen Prinzipien beruhen Tools wie Benerator?)
 
-- Gab es schon einmal Vorfälle in deiner Zeit als Testerin, als Software nach ausreichendem Testen größere Fehler hatte?
+- Marcus' Kommentare:
 
-- Wie viele Fehler entdeckst du ungefähr pro Testlauf?
+Hab's mir jetzt nochmal durchgelesen und ich denke am wichtigsten wäre, 1x im Konzept nochmal explizit zu erwähnen, dass bei der Generierung in den beiden Bereichen "Stage (NMS)" und "Command" Objekte/Daten generiert werden müssen, um die gewünschten / zu testenden Deltafälle anhand der Objektverteilung zu erzeugen. Die "Objektverteilung" sieht man ja sogar im Anhang B (um CREATE zu "provozieren" muss in der NMS-Tabelle 1 Objekt sein und in Command kein Objekt), d.h. auch hier kannst du auf diesen Anhang verweisen (oder vielleicht besser zusätzlich noch den relevanten Ausschnitt als weitere Abbildung an der betreffenden Textstelle einfügen)
 
-- Als wie wichtig für qualitativ hochwertige Tests würdest du die hierzu gehörigen Testdaten einschätzen?
+Weiterer Aspekt der im Konzept nochmals explizit erwähnt werden sollte ist, dass du mit den XML Dateien die Datengenerierung "nur" konfigurierst (das steht sogar schon da), und die eigentlichen Testdaten dann In-Memory generiert werden und dann einerseits in die NMS-Stage und andererseits (mittels BGE-API) in Command gespeichert/generiert werden.
 
-- Wie läuft es ab, für neue Tests und neue Testinstanzen von Software Testdaten zu erstellen?
-
-- Wie aufwändig ist dies und auch das Instandhalten von Testdaten, wenn diese einmal erstellt sind?
-
-- Wie stehst du zu automatisiertem Testen?
-
-- Bisher wurden bei FNT auch für automatisierte Tests die Testdaten manuell angelegt. Denkst du, eine Automatisierung der Testdaten könnte den Testprozess vereinfachen?
-
-- Wenn ja: Inwiefern?
-
-- Denkst du, du als manuelle Testerin stehst eher in Konkurrenz zum automatisierten Testen oder können sich manuelles und automatisiertes Testen ergänzen?
-
-
-
-- Could you briefly describe what exactly your job is at FNT?
-
-- How important would you say your job is for the development of high quality software?
-
-- Have there been any incidents in your time as a tester when software had major bugs after insufficient testing?
-
-- Have there ever been incidents in your time as a tester when software had major errors after sufficient testing?
-
-- Approximately how many bugs do you find per test run?
-
-- How important do you consider the test data to be for high quality testing?
-
-- How does it work to create test data for new tests and new test instances of software?
-
-- How time-consuming is this and also the maintenance of test data once it has been created?
-
-- How do you feel about automated testing?
-
-- So far, FNT has created test data manually, even for automated tests. Do you think automating the test data could simplify the testing process?
-
-- If so, in what way?
-
-- As a manual tester, do you think you compete with automated testing or can manual and automated testing complement each other?
-
-Translated with www.DeepL.com/Translator (free version)
-
-
-Hello!
-I am currently writing a report on a university research project where I implemented an automated test data generation for the CIF automated tests. For this, I have created a small survey on the topic. It would be greatly appreciated if some of you could take the time to fill this out!
-
-https://forms.gle/4G34pPcw56AByxF97
-
-Have a great day everyone :)
+Und du kannst ruhig im Konzept (Kapitel 4) an den entsprechenden Stellen auch schon auf die spätere Konkretisierung im Kapitel 5 hinweisen (eine von mir im Kommentar gewünschte konkrete "Deltafallkonfiguration" ist ja z.B. in Listing 5.1 + Tabelle 5.1 schon enthalten,,,

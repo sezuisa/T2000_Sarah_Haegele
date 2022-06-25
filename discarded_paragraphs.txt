@@ -10,3 +10,18 @@ Die starke Fixierung auf die Struktur eines \ac*{SUT} bringt allerdings auch Nac
  
 
 \cite[S. 161]{witte:2019}
+
+
+
+\item \textbf{Whitebox Test Data Generation:} Ein Algorithmus analysiert valide Daten, lernt dabei, wie sich die Daten bei spezifischen Deltafällen unterscheiden und konstruiert auf Basis dieses angelernten Wissens neue Daten.
+\item \textbf{Blackbox Test Data Generation:} Der Programmierer verfasst einige generelle Voraussetzungen für die Deltafälle, welche entweder in einer externen Datei erfasst oder intern nur als Konstanten gespeichert werden. Hiermit kann ein Algorithmus die Daten mit den benötigten Anpassungen generieren.
+
+
+An diesem Punkt wurde das Einlernen in die Prinzipien des Machine Learning und das Umsetzen eines entsprechenden Algorithmus als zu komplex evaluiert. Gerade auch weil Testdaten bestimmte Bedingungen zu 100\% erfüllen müssen, um so Tests nicht aufgrund falsch konfigurierter Testdaten fehlschlagen zu lassen, wurde das Risiko, dass durch einen auf Machine Learning basierenden Algorithmus, der aufgrund fehlender Erfahrung im Bereich Machine Learning nicht optimal implementiert wurde, zu diesem Zeitpunkt als zu hoch eingeschätzt. Ebenfalls handelt es sich bei den Voraussetzungen für die Deltafälle um jederzeit bekannte Parameter, die wenig komplex sind. Nur hierfür einen Machine Learning Algorithmus zu implementieren, wäre für die Größe des Problems nicht angemessen und händisch effizienter zu lösen.
+
+Da für den Umfang des Projekts die Herangehensweise mit Machine Learning als zu aufwändig erscheint (Algorithmus muss entworfen und mit vielen Daten trainiert werden), wurde sich zunächst für die händische Methode entschieden, da der primäre Fokus des Projekts darauf liegt, die Datengenerierung zumindest für den Anfang möglichst simpel zu implementieren, sodass in der begrenzten Zeit, die für das Projekt zur Verfügung steht, möglichst viel Ergebnisse erzielt werden. 
+
+Auch nach einer Absprache mit dem für das \ac{CIF} maßgeblich verantwortlichen Entwicklerteam PSE 2 wurde eine eher händische Vorgehensweise als angemessen für den Rahmen des Projekts evaluiert. Es sollte versucht werden, sich nur an bereits vorhandenen Tools und Ressourcen zu bedienen und keine größeren externen Frameworks oder Applikationen einbinden zu müssen. Auch hierfür bietet sich der händische Prozess an, da vom Entwickler selbst evaluiert werden kann, welche Tools wo eingesetzt werden können, er*sie mit diesen bereits vertraut ist und sich diese im Unternehmen bewährt haben und so mit einer höheren Sicherheit verwendet werden können. Es ist ein logischer Schluss, dass das Potential für Fehler sich erhöht, je mehr Frameworks und Tools für ein Projekt verwendet werden, da jedes dieser Tools eigene und einzigartige Fehler beinhalten kann.
+
+
+weiteres denkbares Design Pattern: Abstract Factory oder Builder. Factory Method ist allerdings simpler, benötigt weniger Klassen, ist also übersichtlicher, und bildet im Grunde genau die Realität bei den Testdaten ab: Je nach Entitätsgruppe sind verschiedene Vorbedingungen etc. benötigt, der allgemeine Ablauf bleibt aber gleich - daher bietet es sich an, je nach Entiätsgruppe einen darauf angepassten DataGenerator auszuwählen
